@@ -41,10 +41,10 @@ export default function Header({
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded bg-primary/20 border border-primary flex items-center justify-center text-primary font-bold font-label-code text-xs">
-            AS
+            TT
           </div>
           <div className="flex flex-col justify-center">
-            <span className="font-headline-sm text-xs text-on-surface tracking-wider uppercase font-bold">AEROSCADA</span>
+            <span className="font-headline-sm text-xs text-on-surface tracking-wider uppercase font-bold">TRIPLE T</span>
             <span className="font-label-micro text-[10px] text-secondary font-semibold">
               {currentMission?.callsign || "FALCON-04 (MALE UAV)"}
             </span>

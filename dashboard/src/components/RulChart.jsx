@@ -151,12 +151,15 @@ export default function RulChart({
             <path d={projPathD} fill="none" stroke="#ffb95f" strokeWidth="1.8" strokeDasharray="4,3" strokeLinecap="round" />
           )}
 
-          {/* Anomaly Inception Line */}
+          {/* Anomaly Inception Line & Uncertainty Note */}
           {anomalyX && (
             <g>
               <line x1={anomalyX} y1="10" x2={anomalyX} y2="148" stroke="#ffb95f" strokeWidth="1" strokeDasharray="2,2" />
               <text x={anomalyX} y="22" fill="#ffb95f" fontFamily="JetBrains Mono" fontSize="8" fontWeight="700" textAnchor="middle">
                 ANOMALY T+{tFirstDetected}s
+              </text>
+              <text x={Math.min(680, anomalyX + 8)} y="36" fill="#4cd7f6" fontFamily="JetBrains Mono" fontSize="7.5" fontStyle="italic">
+                * Estimate uncertainty decreases as degradation evidence accumulates
               </text>
             </g>
           )}
@@ -196,6 +199,9 @@ export default function RulChart({
             </span>
             <span className="text-tertiary flex items-center gap-1">
               <span className="w-2 h-0.5 bg-tertiary border-b stroke-dasharray"></span> PROJECTED TRAJECTORY
+            </span>
+            <span className="text-outline italic hidden lg:inline">
+              (Estimate uncertainty decreases as degradation evidence accumulates)
             </span>
           </div>
           <span className="hover:text-on-surface cursor-pointer" onClick={() => onSeek(numFrames - 1)}>[END T+{numFrames - 1}s]</span>

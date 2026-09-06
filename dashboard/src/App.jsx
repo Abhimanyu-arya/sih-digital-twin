@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
-import Sidebar from './components/Sidebar';
 import HealthStatusMonitor from './components/HealthStatusMonitor';
 import RulProjectionCard from './components/RulProjectionCard';
 import SensorMatrix from './components/SensorMatrix';
 import DiagnosticInferenceEngine from './components/DiagnosticInferenceEngine';
 import RulChart from './components/RulChart';
-import ReplayScrubber from './components/ReplayScrubber';
 import DebugJsonInspector from './components/DebugJsonInspector';
 
 export default function App() {
@@ -43,6 +41,12 @@ export default function App() {
         setLoading(false);
       });
   }, []);
+
+  // Reset index and playback whenever selected mission changes
+  useEffect(() => {
+    setCurrentIndex(0);
+    setIsPlaying(false);
+  }, [selectedMissionId]);
 
   // Update Zulu clock
   useEffect(() => {
@@ -97,7 +101,7 @@ export default function App() {
     return (
       <div className="h-screen bg-background text-on-surface flex items-center justify-center flex-col gap-4 font-telemetry-data">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <span className="text-primary tracking-widest uppercase">INITIALIZING AEROSCADA AVIONICS TELEMETRY ENGINE...</span>
+        <span className="text-primary tracking-widest uppercase">INITIALIZING TRIPLE T AVIONICS TELEMETRY ENGINE...</span>
       </div>
     );
   }
@@ -115,12 +119,15 @@ export default function App() {
   const currentMission = missions.find(m => m.mission_id === selectedMissionId) || missions[0];
   const telemetry = currentMission?.telemetry || [];
   const totalFrames = telemetry.length;
-  const currentFrame = telemetry[currentIndex] || telemetry[0] || {};
+  
+  // Safe indexing bounds clamp
+  const validIndex = Math.min(currentIndex, Math.max(0, totalFrames - 1));
+  const currentFrame = telemetry[validIndex] || telemetry[0] || {};
   const currentSystemState = currentFrame.system_status?.state || "NOMINAL";
 
   return (
     <div className="h-screen flex flex-col bg-surface text-on-surface overflow-hidden">
-      {/* Top Header Bar (Fixed height h-16, flex-none) */}
+      {/* Top Header Bar */}
       <Header 
         currentMission={currentMission}
         missions={missions}
@@ -132,13 +139,9 @@ export default function App() {
         onToggleDebug={() => setIsDebugOpen(!isDebugOpen)}
       />
 
-      {/* Main Body Area: Flex-1 Row (Sidebar on left, Main Canvas on right) */}
+      {/* Main Workspace Canvas (Full Width, Sidebar Removed) */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar Drawer */}
-        <Sidebar />
-
-        {/* Dynamic Main Workspace Canvas */}
-        <main className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3">
+        <main className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 w-full">
           
           {/* Debug Raw JSON Inspector Overlay */}
           {isDebugOpen && (
@@ -164,12 +167,12 @@ export default function App() {
             </div>
           </section>
 
-          {/* 2. Sensor Telemetry Matrix (Density-reduced with large values & hover tooltips) */}
+          {/* 2. Sensor Telemetry Matrix */}
           <SensorMatrix 
             sensors={currentFrame.sensors}
           />
 
-          {/* 3. Diagnostic Inference Engine (SHAP #1 Primary Factor Expanded by Default) */}
+          {/* 3. Diagnostic Inference Engine (SHAP) */}
           <DiagnosticInferenceEngine 
             shapFactors={currentFrame.shap_factors}
             faultLabel={currentMission.fault_label}
@@ -178,7 +181,7 @@ export default function App() {
           {/* 4. Combined RUL Vector Line Chart & Mission Replay Scrubber */}
           <RulChart 
             telemetry={telemetry}
-            currentIndex={currentIndex}
+            currentIndex={validIndex}
             faultStartS={currentMission.fault_start_s}
             tFirstDetected={currentMission.t_first_detected}
             totalFrames={totalFrames}
@@ -196,4 +199,5 @@ export default function App() {
     </div>
   );
 }
+
 
