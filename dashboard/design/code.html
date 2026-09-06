@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-primary": "#00687a", "secondary-fixed-dim": "#4edea3", "surface-container-low": "#191b23", "on-secondary-container": "#00311f", "outline-variant": "#3d494c", "on-secondary": "#003824", "on-tertiary-fixed": "#2a1700", "on-secondary-fixed": "#002113", "surface-variant": "#32353d", "surface-container": "#1d1f27", "primary-container": "#06b6d4", "primary-fixed": "#acedff", "primary": "#4cd7f6", "secondary": "#4edea3", "tertiary-fixed-dim": "#ffb95f", "secondary-container": "#00a572", "surface": "#10131a", "on-tertiary-container": "#563400", "surface-dim": "#10131a", "surface-container-high": "#272a32", "on-primary-fixed-variant": "#004e5c", "on-primary-container": "#00424f", "on-primary": "#003640", "inverse-on-surface": "#2d3038", "secondary-fixed": "#6ffbbe", "primary-fixed-dim": "#4cd7f6", "tertiary-fixed": "#ffddb8", "outline": "#869397", "on-primary-fixed": "#001f26", "on-surface-variant": "#bcc9cd", "inverse-surface": "#e1e2ec", "tertiary": "#ffb95f", "on-background": "#e1e2ec", "on-error": "#690005", "on-surface": "#e1e2ec", "error-container": "#93000a", "on-secondary-fixed-variant": "#005236", "tertiary-container": "#e79400", "background": "#10131a", "error": "#ffb4ab", "surface-tint": "#4cd7f6", "surface-container-highest": "#32353d", "surface-bright": "#363941", "surface-container-lowest": "#0b0e15", "on-tertiary": "#472a00", "on-error-container": "#ffdad6", "on-tertiary-fixed-variant": "#653e00" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "unit-lg": "1rem", "unit-2xs": "0.125rem", "unit-md": "0.75rem", "gutter-dense": "0.5rem", "gutter-panel": "0.75rem", "frame-pad": "1rem", "unit-sm": "0.5rem", "unit-xs": "0.25rem", "unit-xl": "1.5rem" }, "fontFamily": { "headline-sm": [ "Space Grotesk" ], "telemetry-data": [ "JetBrains Mono" ], "label-micro": [ "JetBrains Mono" ], "label-code": [ "JetBrains Mono" ], "display-lg-mobile": [ "JetBrains Mono" ], "headline-lg": [ "Space Grotesk" ], "display-md": [ "JetBrains Mono" ], "display-lg": [ "JetBrains Mono" ], "body-default": [ "Inter" ], "body-compact": [ "Inter" ], "telemetry-unit": [ "JetBrains Mono" ] }, "fontSize": { "headline-sm": [ "15px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" } ], "telemetry-data": [ "14px", { "lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "label-micro": [ "9px", { "lineHeight": "12px", "letterSpacing": "0.12em", "fontWeight": "700" } ], "label-code": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" } ], "display-lg-mobile": [ "24px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "headline-lg": [ "20px", { "lineHeight": "24px", "letterSpacing": "0.04em", "fontWeight": "700" } ], "display-md": [ "24px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "display-lg": [ "32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "body-default": [ "13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" } ], "body-compact": [ "12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" } ], "telemetry-unit": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "400" } ] } } } };</script></head><body class="bg-background font-body-default text-on-surface antialiased select-none"><header class="fixed top-0 left-0 right-0 h-14 bg-surface-container-lowest border-b border-outline-variant/30 z-50 px-gutter-panel flex items-center justify-between"><div class="flex items-center gap-gutter-panel"><img alt="AeroSCADA UAV Health Telemetry Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WmL8ID1wOLy4Kebu_UULSCVrdJ2PcjwOfa7mNJy-j-9ztWDRzJi6vLa0DTkimJVxoheNuqFW3yzxlM79WaD1_c_11fNe7I0avwdz-cSxyrq04AiByVIzAPkIYW3wfCPdHgDyCtSRZHXR1OzjlxPSzopMD4LRpJLhlQ2I4h-Yz9FISlZE4UNe3Se7PQJqAfyla6vMhZgX8o-oNLC9637FTlGqAhUiJwYingdyChXHNE58Y1DJCJa1F9P8g"/><div class="flex flex-col justify-center"><div class="flex items-center gap-unit-xs"><span class="font-headline-sm text-headline-sm text-on-surface tracking-wider uppercase">AEROSCADA</span><span class="font-label-code text-label-code text-primary">// EHM-V4.9 UAV FLEET OPS</span></div><div class="flex items-center gap-unit-sm"><span class="font-label-code text-label-code text-on-surface-variant">CALLSIGN:</span><span class="font-label-code text-label-code text-secondary font-bold">FALCON-04 (MALE-UAV)</span><span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span></div></div><div class="h-7 w-[1px] bg-outline-variant/40 mx-unit-xs hidden xl:block"></div><div class="hidden xl:flex items-center gap-unit-xs bg-surface-container-low px-unit-sm py-unit-2xs border border-outline-variant/40 rounded"><span class="font-label-micro text-label-micro text-on-surface-variant uppercase">MISSION</span><span class="font-telemetry-data text-telemetry-data text-on-surface font-semibold">#MSN-8492-BRAVO</span><span class="font-label-micro text-label-micro text-tertiary bg-tertiary-container/20 px-unit-xs py-unit-2xs rounded border border-tertiary/30">SORTIE IN PROGRESS</span><span class="material-symbols-outlined text-outline text-[16px]">arrow_drop_down</span></div></div><div class="flex items-center gap-gutter-panel"><div class="hidden md:flex items-center gap-gutter-panel bg-surface-container-low px-unit-md py-unit-2xs border border-outline-variant/30 rounded"><div class="flex flex-col text-right"><span class="font-label-micro text-label-micro text-on-surface-variant">ZULU / UTC</span><span class="font-telemetry-data text-telemetry-data text-on-surface">14:28:49.082 Z</span></div><div class="h-6 w-[1px] bg-outline-variant/30"></div><div class="flex flex-col text-right"><span class="font-label-micro text-label-micro text-on-surface-variant">MET (ELAPSED)</span><span class="font-telemetry-data text-telemetry-data text-primary">04:19:12</span></div></div><div class="hidden lg:flex items-center gap-unit-xs px-unit-sm py-unit-2xs bg-surface-container-low border border-outline-variant/30 rounded"><span class="material-symbols-outlined text-secondary text-[16px]">satellite_alt</span><div class="flex flex-col"><span class="font-label-micro text-label-micro text-on-surface-variant">SATCOM UPLINK</span><span class="font-telemetry-data text-telemetry-data text-secondary">99.4% NOMINAL</span></div></div><div class="flex items-center gap-unit-xs"><button class="h-8 px-unit-xs bg-surface-container-high border border-outline-variant text-on-surface hover:border-primary hover:text-primary transition-colors flex items-center gap-unit-2xs rounded" title="Audio Warning Alarm Toggle" type="button"><span class="material-symbols-outlined text-[16px] text-secondary">volume_up</span><span class="font-label-code text-label-code hidden sm:inline">AUDIO</span></button><button class="h-8 px-unit-xs bg-surface-container-high border border-outline-variant text-on-surface hover:border-error hover:text-error transition-colors flex items-center gap-unit-2xs rounded" title="Master Visual Alert Toggle" type="button"><span class="material-symbols-outlined text-[16px] text-error">warning</span><span class="font-label-code text-label-code hidden sm:inline">MASTER WARN</span></button></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><aside class="fixed left-0 top-14 bottom-0 w-64 bg-surface-container-lowest border-r border-outline-variant/30 z-40 flex flex-col justify-between"><div class="py-unit-sm"><div class="px-gutter-panel py-unit-2xs mb-unit-xs flex items-center justify-between"><span class="font-label-micro text-label-micro text-outline uppercase tracking-widest">Subsystems Diagnostics</span><span class="font-label-micro text-label-micro text-secondary">ONLINE</span></div><nav class="flex flex-col gap-unit-2xs px-unit-sm" data-active-classes="bg-primary-container text-on-primary-container font-bold"><a aria-current="page" class="flex items-center gap-unit-sm px-unit-md py-unit-sm rounded transition-colors bg-primary-container text-on-primary-container font-bold" data-path="overview-and-health-summary" href="#"><span class="font-label-code text-label-code">01 // SYSTEM OVERVIEW</span></a><a class="flex items-center gap-unit-sm px-unit-md py-unit-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="turbofan-core-telemetry" href="#"><span class="font-label-code text-label-code">02 // PISTON ENGINE CORE (ROTAX 912)</span></a><a class="flex items-center gap-unit-sm px-unit-md py-unit-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="lubrication-and-oil-diagnostics" href="#"><span class="font-label-code text-label-code">03 // OIL &amp; THERMAL LOOP</span></a><a class="flex items-center gap-unit-sm px-unit-md py-unit-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="fuel-manifold-and-feed" href="#"><span class="font-label-code text-label-code">04 // FUEL FEED &amp; HYDRAULICS</span></a><a class="flex items-center gap-unit-sm px-unit-md py-unit-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="avionics-bus-and-fadec" href="#"><span class="font-label-code text-label-code">05 // FADEC &amp; COMM BUS</span></a><a class="flex items-center gap-unit-sm px-unit-md py-unit-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="fault-matrix-and-event-log" href="#"><span class="font-label-code text-label-code">06 // FAULT MATRIX &amp; LOGS</span></a></nav></div><div class="p-unit-md border-t border-outline-variant/30 bg-surface-container-low"><div class="flex items-center justify-between mb-unit-xs"><span class="font-label-micro text-label-micro text-outline">GCS NODE ID</span><span class="font-label-code text-label-code text-on-surface">CREECH-GCS-04</span></div><div class="flex items-center justify-between"><span class="font-label-micro text-label-micro text-outline">SECURITY LEVEL</span><span class="font-label-micro text-label-micro text-secondary-fixed-dim border border-secondary/30 bg-secondary/10 px-unit-2xs py-0.5 rounded uppercase">DEMO BUILD // UNCLASSIFIED</span></div></div></aside><div class="pl-64"><main class="relative pt-14 w-full bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- PRIMARY AVIONICS OPERATIONAL CANVAS -->
+<div class="w-full bg-surface-container-lowest p-gutter-dense md:p-gutter-panel flex flex-col gap-gutter-dense text-on-surface">
+<!-- SUB-NAV / DIAGNOSTIC MODE & OPERATIONAL BAR -->
+<div class="flex flex-wrap items-center justify-between gap-unit-sm bg-surface-container-low px-unit-md py-unit-xs border border-outline-variant/40 rounded">
+<div class="flex items-center gap-unit-md">
+<div class="flex items-center gap-unit-xs">
+<span class="inline-block w-2 h-2 rounded-sm bg-tertiary animate-ping"></span>
+<span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-wider">AeroSCADA Workstation 04</span>
+</div>
+<div class="hidden sm:flex items-center gap-unit-xs bg-surface-container-high px-unit-xs py-0.5 rounded">
+<span class="font-label-micro text-label-micro text-outline">ENGINE ID:</span>
+<span class="font-label-code text-label-code text-primary font-bold">ROTAX-912-ULS</span>
+</div>
+<div class="hidden lg:flex items-center gap-unit-xs">
+<span class="font-label-micro text-label-micro text-outline">SERIAL:</span>
+<span class="font-telemetry-data text-telemetry-data text-on-surface-variant">SN-8841-A2</span>
+</div>
+</div>
+<!-- SIMULATION STATE SWITCHER -->
+<div class="flex items-center gap-unit-xs bg-surface-container-highest/80 p-0.5 rounded">
+<span class="font-label-micro text-label-micro text-on-surface-variant px-unit-xs uppercase">STATE SIM:</span>
+<button class="px-unit-sm py-0.5 font-label-code text-label-code rounded text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1" id="btn-state-nominal" onclick="setEngineState('nominal')" type="button">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>NOMINAL</span>
+</button>
+<button class="px-unit-sm py-0.5 font-label-code text-label-code rounded bg-tertiary-container/30 text-tertiary font-bold transition-colors flex items-center gap-1" id="btn-state-degraded" onclick="setEngineState('degraded')" type="button">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+<span>DEGRADED (ACTIVE)</span>
+</button>
+<button class="px-unit-sm py-0.5 font-label-code text-label-code rounded text-on-surface-variant hover:text-error transition-colors flex items-center gap-1" id="btn-state-critical" onclick="setEngineState('critical')" type="button">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span>CRITICAL</span>
+</button>
+</div>
+</div>
+<!-- 1. TOP STATUS & RUL COMMAND BAR -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-dense">
+<!-- Primary Alert State Card (4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container-low p-unit-md border-2 border-tertiary/70 rounded flex flex-col justify-between relative overflow-hidden transition-all duration-300" id="engine-health-card">
+<div class="absolute -right-8 -top-8 w-28 h-28 bg-tertiary/10 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro text-tertiary tracking-widest uppercase flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-tertiary">warning</span>
+              HEALTH STATUS MONITOR
+            </span>
+<div class="font-headline-lg text-headline-lg text-tertiary uppercase mt-1 tracking-wider flex items-center gap-2" id="engine-state-title">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-ping"></span>
+              DEGRADED (CAUTION)
+            </div>
+</div>
+<span class="font-label-code text-label-code text-tertiary bg-tertiary/20 px-unit-xs py-0.5 rounded border border-tertiary/40">LVL 2 CAUTION</span>
+</div>
+<!-- Quick Sub-status Metrics Array -->
+<div class="grid grid-cols-3 gap-unit-xs my-unit-sm pt-unit-xs border-t border-outline-variant/30">
+<div class="bg-surface-container-high/60 p-unit-xs rounded">
+<span class="font-label-micro text-label-micro text-outline block">OIL PRESSURE</span>
+<span class="font-telemetry-data text-telemetry-data text-error font-bold block mt-0.5">1.65 bar</span>
+<span class="font-label-micro text-label-micro text-error/80">-0.35 BELOW MIN</span>
+</div>
+<div class="bg-surface-container-high/60 p-unit-xs rounded">
+<span class="font-label-micro text-label-micro text-outline block">CRANKCASE VIB</span>
+<span class="font-telemetry-data text-telemetry-data text-tertiary font-bold block mt-0.5">0.88 g</span>
+<span class="font-label-micro text-label-micro text-tertiary/80">LIMIT: 0.50 g</span>
+</div>
+<div class="bg-surface-container-high/60 p-unit-xs rounded">
+<span class="font-label-micro text-label-micro text-outline block">OIL SUMP TEMP</span>
+<span class="font-telemetry-data text-telemetry-data text-tertiary font-bold block mt-0.5">124.8°C</span>
+<span class="font-label-micro text-label-micro text-tertiary/80">LIMIT: 130°C</span>
+</div>
+</div>
+<div class="flex items-center justify-between font-label-micro text-label-micro text-outline pt-unit-2xs border-t border-outline-variant/20">
+<span>ANOMALY INCEPTION: T+03:52:19</span>
+<span class="text-tertiary">PERSISTENCE: 23m 13s</span>
+</div>
+</div>
+<!-- Prominent RUL Readout (5 Cols) -->
+<div class="lg:col-span-5 bg-surface-container-low p-unit-md border border-outline-variant/50 rounded flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-primary">timer</span>
+            REMAINING USEFUL LIFE (RUL) PROJECTION
+          </span>
+<span class="font-label-code text-label-code text-primary bg-primary/10 px-unit-xs py-0.5 rounded border border-primary/30">FADEC ML MODEL // ENSEMBLE-V4</span>
+</div>
+<div class="flex flex-wrap items-baseline gap-x-unit-md gap-y-unit-xs my-unit-xs">
+<div class="flex items-baseline gap-unit-xs">
+<span class="font-display-lg text-display-lg text-tertiary font-bold tracking-tight" id="rul-hours-val">04h 18m</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant">EST. SAFE TIME</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-code text-label-code text-error font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+              -42m vs flight plan
+            </span>
+<span class="font-label-micro text-label-micro text-outline">95% CI: [3.9h — 4.4h]</span>
+</div>
+</div>
+<div class="bg-tertiary/10 border-l-2 border-tertiary px-unit-sm py-unit-xs rounded-r">
+<span class="font-label-micro text-label-micro text-tertiary font-bold tracking-wide uppercase block">DIRECTIVE ADVISORY:</span>
+<span class="font-body-compact text-body-compact text-on-surface block mt-0.5">
+            RECOMMENDATION: REDUCE RPM TO 4,800 (CRUISE) &amp; INITIATE DESCENT / DIVERT TO PREVENT CRANKSHAFT BEARING SEIZURE.
+          </span>
+</div>
+</div>
+<!-- Mission Diversion Calculator / Quick Actions (3 Cols) -->
+<div class="lg:col-span-3 bg-surface-container-low p-unit-md border border-outline-variant/50 rounded flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">MISSION CONTEXT</span>
+<span class="font-label-micro text-label-micro text-secondary">AIRSPACE: SECURE</span>
+</div>
+<div class="space-y-unit-2xs my-unit-xs font-telemetry-data text-telemetry-data">
+<div class="flex justify-between items-center py-0.5 border-b border-outline-variant/20">
+<span class="font-label-micro text-label-micro text-outline">WAYPOINT FOX-3 ETA</span>
+<span class="text-on-surface font-semibold">01h 08m</span>
+</div>
+<div class="flex justify-between items-center py-0.5 border-b border-outline-variant/20">
+<span class="font-label-micro text-label-micro text-outline">HOME BASE (CREECH)</span>
+<span class="text-tertiary font-semibold">03h 44m (TIGHT)</span>
+</div>
+<div class="flex justify-between items-center py-0.5">
+<span class="font-label-micro text-label-micro text-outline">LOITER DURATION LOSS</span>
+<span class="text-error font-semibold">-02h 20m</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-unit-xs">
+<button class="bg-surface-container-high border border-outline-variant text-on-surface hover:border-primary hover:text-primary transition-colors py-unit-xs px-unit-xs rounded font-label-code text-label-code text-center uppercase flex items-center justify-center gap-1" onclick="alert('THROTTLE OVERRIDE ADVISORY COMMUNICATED TO GCS PILOT')" type="button">
+<span class="material-symbols-outlined text-[14px]">speed</span>
+            4,800 RPM CRUISE
+          </button>
+<button class="bg-primary/20 border border-primary text-primary hover:bg-primary/30 transition-colors py-unit-xs px-unit-xs rounded font-label-code text-label-code text-center uppercase font-bold flex items-center justify-center gap-1" onclick="alert('ROUTE OPTION FOX-3 RECALCULATED')" type="button">
+<span class="material-symbols-outlined text-[14px]">alt_route</span>
+            DIVERT FOX-3
+          </button>
+</div>
+</div>
+</section>
+<!-- 2. SENSOR MONITORING MATRIX (7 Rotax 912 ULS Piston Sensors) -->
+<section>
+<div class="flex items-center justify-between mb-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<span class="material-symbols-outlined text-primary text-[16px]">sensors</span>
+<span class="font-headline-sm text-headline-sm uppercase text-on-surface">Sensor Telemetry Matrix</span>
+<span class="font-label-micro text-label-micro text-outline">// ROTAX 912 ULS SAMPLING AT 100Hz</span>
+</div>
+<span class="font-label-micro text-label-micro text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> 7/7 ACTIVE CHANNELS NOMINAL OR FLAGGED
+        </span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-gutter-dense">
+<!-- SENSOR 1: RPM (NOMINAL) -->
+<div class="bg-surface-container-low p-unit-sm border border-outline-variant/40 rounded flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">RPM</span>
+<span class="font-label-micro text-label-micro text-secondary bg-secondary/10 px-unit-2xs py-0.5 rounded border border-secondary/30">NOMINAL</span>
+</div>
+<div class="my-unit-xs">
+<span class="font-display-md text-display-md text-on-surface font-bold">5,420</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant block">RPM (CRANKSHAFT)</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden my-1">
+<div class="bg-secondary h-full" style="width: 88%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline pt-0.5">
+<span>SAFE: &lt;5,500 CONT</span>
+<span class="text-secondary">5,800 MAX</span>
+</div>
+</div>
+<!-- SENSOR 2: CHT (NOMINAL / ELEVATED CLIMB) -->
+<div class="bg-surface-container-low p-unit-sm border border-outline-variant/40 rounded flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">CYL HEAD TEMP</span>
+<span class="font-label-micro text-label-micro text-secondary bg-secondary/10 px-unit-2xs py-0.5 rounded border border-secondary/30">NOMINAL</span>
+</div>
+<div class="my-unit-xs">
+<span class="font-display-md text-display-md text-on-surface font-bold">118°C</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant block">LIMIT: 135°C</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden my-1">
+<div class="bg-secondary h-full" style="width: 87%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline pt-0.5">
+<span class="text-on-surface-variant">+6°C CLIMB</span>
+<span class="text-secondary">MARGIN 17°</span>
+</div>
+</div>
+<!-- SENSOR 3: EGT (NOMINAL) -->
+<div class="bg-surface-container-low p-unit-sm border border-outline-variant/40 rounded flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">EXHAUST GAS</span>
+<span class="font-label-micro text-label-micro text-secondary bg-secondary/10 px-unit-2xs py-0.5 rounded border border-secondary/30">NOMINAL</span>
+</div>
+<div class="my-unit-xs">
+<span class="font-display-md text-display-md text-on-surface font-bold">815°C</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant block">LIMIT: 880°C</span>
+</div>
+<!-- Mini SVG Sparkline showing nominal cruise range -->
+<svg class="w-full h-4 text-secondary" fill="none" viewbox="0 0 100 20">
+<path d="M0,14 Q25,12 50,13 T100,11" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"></path>
+</svg>
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline pt-0.5">
+<span class="text-secondary font-semibold">STABLE</span>
+<span class="text-secondary">MARGIN 65°</span>
+</div>
+</div>
+<!-- SENSOR 4: OIL PRESSURE (CRITICAL PRIMARY FAULT - BAR) -->
+<div class="bg-surface-container-low p-unit-sm border-2 border-error rounded flex flex-col justify-between shadow-[0_0_16px_rgba(255,180,171,0.25)] relative overflow-hidden">
+<div class="absolute inset-0 bg-error/5 pointer-events-none animate-pulse"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-error font-bold uppercase">OIL PRESSURE</span>
+<span class="font-label-micro text-label-micro text-error bg-error-container/40 px-unit-2xs py-0.5 rounded border border-error animate-pulse">CRITICAL</span>
+</div>
+<div class="my-unit-xs">
+<span class="font-display-md text-display-md text-error font-bold">1.65</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant block">BAR (2.0 - 5.0 BAR)</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden my-1">
+<div class="bg-error h-full" style="width: 33%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline pt-0.5">
+<span class="text-error font-bold">-0.35 BAR BELOW MIN</span>
+<span class="text-error font-bold">GALLERY</span>
+</div>
+</div>
+<!-- SENSOR 5: OIL TEMP (ELEVATED / FLAGGED) -->
+<div class="bg-surface-container-low p-unit-sm border-2 border-tertiary rounded flex flex-col justify-between shadow-[0_0_12px_rgba(255,185,95,0.18)]">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-tertiary font-bold uppercase">OIL TEMP</span>
+<span class="font-label-micro text-label-micro text-tertiary bg-tertiary/20 px-unit-2xs py-0.5 rounded border border-tertiary">FLAGGED</span>
+</div>
+<div class="my-unit-xs">
+<span class="font-display-md text-display-md text-tertiary font-bold">124.8°C</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant block">LIMIT: 130°C</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden my-1">
+<div class="bg-tertiary h-full" style="width: 96%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline pt-0.5">
+<span class="text-tertiary font-semibold">+14°C TREND</span>
+<span class="material-symbols-outlined text-[13px] text-tertiary">device_thermostat</span>
+</div>
+</div>
+<!-- SENSOR 6: VIBRATION (FLAGGED - IN "g") -->
+<div class="bg-surface-container-low p-unit-sm border border-tertiary rounded flex flex-col justify-between shadow-[0_0_12px_rgba(255,185,95,0.12)]">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-tertiary font-bold uppercase">CRANKCASE VIB</span>
+<span class="font-label-micro text-label-micro text-tertiary bg-tertiary/20 px-unit-2xs py-0.5 rounded border border-tertiary">WARNING</span>
+</div>
+<div class="my-unit-xs">
+<span class="font-display-md text-display-md text-tertiary font-bold">0.88</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant block">g (LIMIT: 0.50 g)</span>
+</div>
+<!-- Sparkline showing elevated vibration -->
+<svg class="w-full h-4 text-tertiary" fill="none" viewbox="0 0 100 20">
+<path d="M0,15 L20,13 L35,16 L45,11 L55,15 L65,8 L75,17 L85,6 L100,5" stroke="currentColor" stroke-linecap="round" stroke-width="1.75"></path>
+</svg>
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline pt-0.5">
+<span class="text-tertiary font-bold">+0.38 g OVER</span>
+<span class="text-tertiary">SPLIT LINE</span>
+</div>
+</div>
+<!-- SENSOR 7: ALTERNATOR VOLTAGE (NOMINAL - 13.8V PISTON BUS) -->
+<div class="bg-surface-container-low p-unit-sm border border-outline-variant/40 rounded flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">ALT BUS VOLT</span>
+<span class="font-label-micro text-label-micro text-secondary bg-secondary/10 px-unit-2xs py-0.5 rounded border border-secondary/30">NOMINAL</span>
+</div>
+<div class="my-unit-xs">
+<span class="font-display-md text-display-md text-on-surface font-bold">13.9</span>
+<span class="font-telemetry-unit text-telemetry-unit text-on-surface-variant block">VDC (13.8 VDC NOM)</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden my-1">
+<div class="bg-secondary h-full" style="width: 52%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline pt-0.5">
+<span>12V DC CHARGING</span>
+<span class="text-secondary">CLEAN</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. COLLAPSIBLE TOP CONTRIBUTING FACTORS PANEL -->
+<section class="bg-surface-container-low border border-tertiary/70 rounded p-unit-md transition-all duration-300" id="factors-panel">
+<div class="flex flex-wrap items-center justify-between gap-unit-xs cursor-pointer select-none" onclick="toggleFactorsPanel()">
+<div class="flex items-center gap-unit-sm">
+<span class="material-symbols-outlined text-tertiary text-[18px]">account_tree</span>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span>DIAGNOSTIC INFERENCE ENGINE // TOP CONTRIBUTING FACTORS (3 IDENTIFIED)</span>
+<span class="font-label-micro text-label-micro bg-tertiary/20 text-tertiary border border-tertiary/40 px-unit-xs py-0.5 rounded">RUL DECAY CAUSE</span>
+</div>
+<span class="font-label-micro text-label-micro text-outline">NEURAL RESIDUAL ANOMALY DETECTOR • ISOLATED TO RECIPROCATING PISTON ENGINE LUBRICATION SYSTEM</span>
+</div>
+</div>
+<button class="flex items-center gap-1 font-label-code text-label-code text-tertiary hover:underline" type="button">
+<span id="factors-toggle-label">[EXPANDED - CLICK TO COLLAPSE]</span>
+<span class="material-symbols-outlined text-[16px] transition-transform" id="factors-toggle-icon">expand_less</span>
+</button>
+</div>
+<div class="mt-unit-md space-y-unit-sm" id="factors-content">
+<!-- Factor 1 -->
+<div class="bg-surface-container-high/60 border-l-4 border-error p-unit-sm rounded-r flex flex-col md:flex-row md:items-center justify-between gap-unit-sm">
+<div class="space-y-unit-2xs max-w-3xl">
+<div class="flex items-center gap-unit-xs">
+<span class="font-label-code text-label-code text-error font-bold">#1 [65% WEIGHT — PRIMARY]</span>
+<span class="font-label-micro text-label-micro bg-error/20 text-error px-unit-xs py-0.5 rounded">CRITICAL HAZARD</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Oil Pressure Below Minimum Operating Threshold</h4>
+<p class="font-body-compact text-body-compact text-on-surface-variant">
+              Main gallery oil pressure dropped to 1.65 bar (nominal 2.0–5.0 bar). Pressure regulator bypass or scavenge pump aeration detected in dry-sump circuit.
+            </p>
+</div>
+<div class="flex flex-col items-start md:items-end font-telemetry-data text-telemetry-data text-right">
+<span class="text-error font-bold">1.65 bar (-0.35 bar below min)</span>
+<span class="font-label-micro text-label-micro text-outline">CORRELATION FACTOR: 0.96</span>
+</div>
+</div>
+<!-- Factor 2 -->
+<div class="bg-surface-container-high/60 border-l-4 border-tertiary p-unit-sm rounded-r flex flex-col md:flex-row md:items-center justify-between gap-unit-sm">
+<div class="space-y-unit-2xs max-w-3xl">
+<div class="flex items-center gap-unit-xs">
+<span class="font-label-code text-label-code text-tertiary font-bold">#2 [22% WEIGHT — SECONDARY]</span>
+<span class="font-label-micro text-label-micro bg-tertiary/20 text-tertiary px-unit-xs py-0.5 rounded">THERMAL ELEVATION</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Oil Sump &amp; Radiator Temperature Elevation</h4>
+<p class="font-body-compact text-body-compact text-on-surface-variant">
+              Lubricant temperature trending to 124.8°C (approaching 130°C max limit) due to reduced volumetric oil flow and elevated boundary-layer friction.
+            </p>
+</div>
+<div class="flex flex-col items-start md:items-end font-telemetry-data text-telemetry-data text-right">
+<span class="text-tertiary font-bold">124.8°C (+14°C trend)</span>
+<span class="font-label-micro text-label-micro text-outline">CORRELATION FACTOR: 0.81</span>
+</div>
+</div>
+<!-- Factor 3 -->
+<div class="bg-surface-container-high/60 border-l-4 border-outline-variant p-unit-sm rounded-r flex flex-col md:flex-row md:items-center justify-between gap-unit-sm">
+<div class="space-y-unit-2xs max-w-3xl">
+<div class="flex items-center gap-unit-xs">
+<span class="font-label-code text-label-code text-outline font-bold">#3 [13% WEIGHT — CONTRIBUTING]</span>
+<span class="font-label-micro text-label-micro bg-surface-container-highest text-on-surface-variant px-unit-xs py-0.5 rounded">MECHANICAL VIBRATION</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Crankcase Harmonic Vibration Excitation</h4>
+<p class="font-body-compact text-body-compact text-on-surface-variant">
+              Reciprocating assembly accelerometer sensed 0.88 g 2nd-order harmonics along crankcase split line caused by reduced hydrodynamic oil film.
+            </p>
+</div>
+<div class="flex flex-col items-start md:items-end font-telemetry-data text-telemetry-data text-right">
+<span class="text-on-surface font-semibold">0.88 g (LIMIT: 0.50 g)</span>
+<span class="font-label-micro text-label-micro text-outline">CORRELATION FACTOR: 0.64</span>
+</div>
+</div>
+<!-- Operator Action Bar for Diagnostics -->
+<div class="flex flex-wrap items-center justify-between gap-unit-xs pt-unit-xs border-t border-outline-variant/30">
+<div class="flex items-center gap-unit-xs">
+<span class="material-symbols-outlined text-outline text-[16px]">info</span>
+<span class="font-label-micro text-label-micro text-outline">ROOT CAUSE PROBABILITY: DRY SUMP OIL REGULATOR LEAKAGE / PUMP AERATION (91.4%)</span>
+</div>
+<div class="flex items-center gap-unit-xs">
+<button class="px-unit-sm py-1 bg-surface-container-high border border-outline-variant rounded font-label-code text-label-code text-on-surface hover:border-primary hover:text-primary transition-colors flex items-center gap-1" onclick="alert('DIAGNOSTIC REPORT SAVED TO FLIGHT RECORDER NVRAM')" type="button">
+<span class="material-symbols-outlined text-[14px]">download</span>
+              EXPORT FAULT REPORT
+            </button>
+<button class="px-unit-sm py-1 bg-surface-container-high border border-outline-variant rounded font-label-code text-label-code text-tertiary hover:border-tertiary transition-colors flex items-center gap-1" onclick="alert('SIMULATING 4,800 RPM CRUISE BACKOFF: RUL PROJECTION REBOUNDS TO 05h 40m')" type="button">
+<span class="material-symbols-outlined text-[14px]">model_training</span>
+              SIMULATE THROTTLE BACKOFF
+            </button>
+<button class="px-unit-sm py-1 bg-tertiary text-on-tertiary font-bold rounded font-label-code text-label-code hover:brightness-110 transition-all flex items-center gap-1" onclick="acknowledgeCaution()" type="button">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              ACKNOWLEDGE CAUTION
+            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. LIVE LINE CHART: RUL COUNTDOWN & DEGRADATION PROJECTION -->
+<section class="bg-surface-container-low border border-outline-variant/40 rounded p-unit-md flex flex-col">
+<div class="flex flex-wrap items-center justify-between gap-unit-sm mb-unit-sm">
+<div class="flex items-center gap-unit-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">show_chart</span>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface uppercase">RUL Countdown Over Time &amp; Trajectory Projection</h3>
+<span class="font-label-micro text-label-micro text-outline">TELEMETRY CORRELATION ENGINE // HIGH-DENSITY AVIONICS VECTOR TIMELINE</span>
+</div>
+</div>
+<!-- Interactive chart tools -->
+<div class="flex flex-wrap items-center gap-unit-sm">
+<div class="flex items-center gap-1 bg-surface-container-high px-1 py-0.5 rounded text-label-code font-label-code">
+<span class="text-outline text-label-micro px-1">WINDOW:</span>
+<button class="px-1.5 py-0.5 rounded text-on-surface hover:bg-surface-container-highest" type="button">1H</button>
+<button class="px-1.5 py-0.5 rounded bg-primary text-on-primary font-bold" type="button">4H</button>
+<button class="px-1.5 py-0.5 rounded text-on-surface hover:bg-surface-container-highest" type="button">FULL MISSION</button>
+</div>
+<div class="flex items-center gap-1 text-label-code font-label-code">
+<label class="flex items-center gap-1 bg-surface-container-high px-unit-xs py-0.5 rounded cursor-pointer">
+<input checked="" class="accent-primary w-3 h-3" type="checkbox"/>
+<span class="text-primary text-label-micro">95% CI BAND</span>
+</label>
+<label class="flex items-center gap-1 bg-surface-container-high px-unit-xs py-0.5 rounded cursor-pointer">
+<input checked="" class="accent-tertiary w-3 h-3" type="checkbox"/>
+<span class="text-tertiary text-label-micro">VIB SPIKES</span>
+</label>
+</div>
+</div>
+</div>
+<!-- SCADA TECHNICAL VECTOR CHART CONTAINER -->
+<div class="relative w-full h-72 bg-surface-container-lowest border border-outline-variant/30 rounded p-unit-xs overflow-hidden">
+<!-- SVG Vector SCADA Graph -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 900 240">
+<defs>
+<!-- Critical Shaded Divert Zone Gradient (Below 2.0h mark = Y > 190) -->
+<lineargradient id="divertZoneGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffb4ab" stop-opacity="0.08"></stop>
+<stop offset="100%" stop-color="#ffb4ab" stop-opacity="0.25"></stop>
+</lineargradient>
+<!-- Confidence Interval Shaded Gradient -->
+<lineargradient id="ciBandGrad" x1="0" x2="1" y1="0" y2="0">
+<stop offset="0%" stop-color="#ffb95f" stop-opacity="0.10"></stop>
+<stop offset="100%" stop-color="#ffb95f" stop-opacity="0.25"></stop>
+</lineargradient>
+</defs>
+<!-- Horizontal Grid Lines (RUL Hours) -->
+<line stroke="#3d494c" stroke-dasharray="2,3" stroke-width="0.75" x1="45" x2="880" y1="20" y2="20"></line>
+<line stroke="#3d494c" stroke-dasharray="2,3" stroke-width="0.75" x1="45" x2="880" y1="60" y2="60"></line>
+<line stroke="#3d494c" stroke-dasharray="2,3" stroke-width="0.75" x1="45" x2="880" y1="100" y2="100"></line>
+<line stroke="#3d494c" stroke-dasharray="2,3" stroke-width="0.75" x1="45" x2="880" y1="140" y2="140"></line>
+<line stroke="#3d494c" stroke-dasharray="2,3" stroke-width="0.75" x1="45" x2="880" y1="180" y2="180"></line>
+<!-- Critical Threshold Line: 2.0h Remaining -->
+<rect fill="url(#divertZoneGrad)" height="40" width="835" x="45" y="195"></rect>
+<line stroke="#ffb4ab" stroke-dasharray="4,3" stroke-width="1.2" x1="45" x2="880" y1="195" y2="195"></line>
+<text fill="#ffb4ab" font-family="JetBrains Mono" font-size="10" font-weight="700" x="50" y="210">CRITICAL DIVERT THRESHOLD (2.0h RUL)</text>
+<!-- Vertical Time Grid Lines -->
+<line stroke="#3d494c" stroke-width="0.75" x1="45" x2="45" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-dasharray="2,4" stroke-width="0.5" x1="150" x2="150" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-dasharray="2,4" stroke-width="0.5" x1="255" x2="255" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-dasharray="2,4" stroke-width="0.5" x1="360" x2="360" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-dasharray="2,4" stroke-width="0.5" x1="465" x2="465" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-dasharray="2,4" stroke-width="0.5" x1="570" x2="570" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-dasharray="2,4" stroke-width="0.5" x1="675" x2="675" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-dasharray="2,4" stroke-width="0.5" x1="780" x2="780" y1="10" y2="215"></line>
+<line stroke="#3d494c" stroke-width="0.5" x1="880" x2="880" y1="10" y2="215"></line>
+<!-- Y-Axis Labels (RUL in Hours) -->
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="end" x="38" y="24">10h</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="end" x="38" y="64">8h</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="end" x="38" y="104">6h</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="end" x="38" y="144">4h</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="end" x="38" y="184">2h</text>
+<!-- Nominal Baseline Projection Line (Dotted Slate) -->
+<path d="M45,20 L150,45 L255,70 L360,95 L465,120 L570,145 L675,170 L780,195 L880,215" fill="none" stroke="#869397" stroke-dasharray="3,3" stroke-width="1.5"></path>
+<!-- Confidence Band polygon for future projection (T+04:15 to T+08:00) -->
+<polygon fill="url(#ciBandGrad)" points="485,138 600,165 720,205 760,225 760,200 680,185 570,158 485,138"></polygon>
+<!-- Actual Historical RUL Line (Cyan Solid: Takeoff T+00 to Anomaly T+03:52 to Current T+04:15) -->
+<path d="M45,22 L110,38 L180,54 L255,72 L320,88 L380,102 L440,116 L485,138" fill="none" stroke="#4cd7f6" stroke-linejoin="round" stroke-width="2.5"></path>
+<!-- Degraded Projection Trajectory Line (Amber Dashed: T+04:15 onward intersecting divert threshold) -->
+<path d="M485,138 L540,155 L600,174 L660,195 L720,218" fill="none" stroke="#ffb95f" stroke-dasharray="5,4" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Anomaly Inception Marker Point (T+03:52) -->
+<line stroke="#ffb95f" stroke-dasharray="2,2" stroke-width="1" x1="440" x2="440" y1="10" y2="215"></line>
+<circle cx="440" cy="116" fill="#ffb95f" r="4" stroke="#10131a" stroke-width="2"></circle>
+<text fill="#ffb95f" font-family="JetBrains Mono" font-size="9" font-weight="700" text-anchor="middle" x="440" y="30">ANOMALY T+03:52</text>
+<!-- Current Time Vertical Scrubber / Cursor (T+04:15) -->
+<line stroke="#4cd7f6" stroke-width="1.5" x1="485" x2="485" y1="10" y2="215"></line>
+<polygon fill="#4cd7f6" points="480,10 490,10 485,18"></polygon>
+<circle cx="485" cy="138" fill="#4cd7f6" r="5" stroke="#10131a" stroke-width="2"></circle>
+<!-- Intersect Divert Warning Point (T+06:12) -->
+<circle cx="660" cy="195" fill="#ffb4ab" r="4" stroke="#10131a" stroke-width="1.5"></circle>
+<text fill="#ffb4ab" font-family="JetBrains Mono" font-size="9" font-weight="700" text-anchor="middle" x="660" y="190">LIMIT INTERSECT T+06:12</text>
+<!-- X-Axis Labels (Mission Time Elapsed) -->
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="45" y="232">T+00:00</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="150" y="232">T+01:00</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="255" y="232">T+02:00</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="360" y="232">T+03:00</text>
+<text fill="#4cd7f6" font-family="JetBrains Mono" font-size="10" font-weight="700" text-anchor="middle" x="485" y="232">T+04:15 [NOW]</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="570" y="232">T+05:00</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="675" y="232">T+06:00</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="780" y="232">T+07:00</text>
+<text fill="#869397" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="880" y="232">T+08:00</text>
+</svg>
+<!-- Floating Telemetry Tooltip Overlay at Current Point (T+04:15) -->
+<div class="absolute left-[47%] top-16 bg-surface-container-high/95 border border-primary p-unit-xs rounded shadow-lg pointer-events-none transform -translate-x-1/2">
+<div class="flex items-center gap-1 font-label-micro text-label-micro text-primary font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+<span>MET 04:15:32 // LIVE</span>
+</div>
+<div class="font-telemetry-data text-telemetry-data text-on-surface font-bold mt-0.5">
+            RUL: <span class="text-tertiary">04h 18m</span>
+</div>
+<div class="font-label-micro text-label-micro text-error font-semibold mt-0.5">
+            Oil Pressure Anomaly Inception +23m
+          </div>
+</div>
+</div>
+<!-- Chart Legend & Status Bar -->
+<div class="flex flex-wrap items-center justify-between gap-unit-xs mt-unit-xs pt-unit-xs border-t border-outline-variant/30 font-label-micro text-label-micro">
+<div class="flex flex-wrap items-center gap-unit-md">
+<div class="flex items-center gap-1.5">
+<span class="w-4 h-0.5 bg-primary"></span>
+<span class="text-on-surface">HISTORICAL RUL</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-4 h-0.5 bg-tertiary border-b border-dashed border-tertiary"></span>
+<span class="text-tertiary">DEGRADED TRAJECTORY</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-4 h-0.5 border-b border-dotted border-outline"></span>
+<span class="text-outline">NOMINAL FLIGHT PLAN</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-2 bg-error/20 border border-error"></span>
+<span class="text-error">DIVERT THRESHOLD (&lt;2.0h)</span>
+</div>
+</div>
+<span class="text-outline font-telemetry-unit text-telemetry-unit">ALGORITHM: 1D CONVOLUTIONAL NEURAL NETWORK — TWO-STAGE GATED ARCHITECTURE</span>
+</div>
+</section>
+<!-- 5. BOTTOM MISSION TIMELINE SCRUBBER & SLIDER -->
+<section class="bg-surface-container-low border border-outline-variant/40 rounded p-unit-sm flex flex-col gap-unit-xs">
+<!-- Top scrubber telemetry line -->
+<div class="flex items-center justify-between font-label-micro text-label-micro">
+<div class="flex items-center gap-unit-md">
+<span class="text-primary font-bold uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">timeline</span>
+            MISSION REPLAY SCRUBBER
+          </span>
+<span class="text-on-surface-variant">TIMELINE RANGE: T+00:00:00 -&gt; T+08:00:00</span>
+</div>
+<div class="flex items-center gap-unit-sm">
+<span class="text-outline">CURSOR MET:</span>
+<span class="font-telemetry-data text-telemetry-data text-primary font-bold" id="scrubber-clock">04:15:32</span>
+<span class="text-outline">FRAME:</span>
+<span class="font-telemetry-data text-telemetry-data text-on-surface">#25,532</span>
+</div>
+</div>
+<!-- Telemetry Density Heat-Strip Track -->
+<div class="relative w-full h-3 bg-surface-container-lowest rounded overflow-hidden flex">
+<!-- T0 to T02:30 (Green Nominal) -->
+<div class="h-full bg-secondary/70 hover:opacity-100" style="width: 32%;" title="T+00:00 - T+02:30: Nominal Telemetry"></div>
+<!-- T02:30 to T03:52 (Light Caution) -->
+<div class="h-full bg-secondary-container" style="width: 17%;" title="T+02:30 - T+03:52: High Engine Load (Climb)"></div>
+<!-- T03:52 to T04:15 (Amber/Red Anomaly Inception) -->
+<div class="h-full bg-tertiary" style="width: 5%;" title="T+03:52 - T+04:15: Oil Pressure Drop Inception"></div>
+<!-- T04:15 to T06:12 (Projected Degraded Amber Strip) -->
+<div class="h-full bg-tertiary/40 border-r border-error" style="width: 24%;" title="T+04:15 - T+06:12: Projected Degraded Envelope"></div>
+<!-- T06:12 to T08:00 (Critical Failure Risk Red Zone) -->
+<div class="h-full bg-error/30" style="width: 22%;" title="T+06:12 - T+08:00: Critical Margin Violation"></div>
+<!-- Scrubber Needle (at T+04:15 / ~54%) -->
+<div class="absolute top-0 bottom-0 w-1 bg-primary shadow-[0_0_8px_#4cd7f6]" style="left: 54%;"></div>
+</div>
+<!-- Milestone Interactive Slider Track -->
+<div class="relative w-full py-1">
+<input class="w-full accent-primary bg-surface-container-high h-1.5 rounded cursor-ew-resize appearance-none" id="timeline-range-slider" max="480" min="0" oninput="updateScrubber(this.value)" type="range" value="255"/>
+<!-- Milestone Markers Array -->
+<div class="flex justify-between items-center font-label-micro text-label-micro text-outline mt-1 px-1">
+<span class="hover:text-on-surface cursor-pointer" onclick="jumpToMinute(0)">[TAKEOFF T+00:00]</span>
+<span class="hover:text-on-surface cursor-pointer hidden sm:inline" onclick="jumpToMinute(25)">[CLIMB T+00:25]</span>
+<span class="hover:text-on-surface cursor-pointer hidden md:inline" onclick="jumpToMinute(100)">[WP-ALPHA T+01:40]</span>
+<span class="text-tertiary font-bold hover:underline cursor-pointer flex items-center gap-0.5" onclick="jumpToMinute(232)">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span> [ANOMALY T+03:52]
+          </span>
+<span class="text-primary font-bold hover:underline cursor-pointer flex items-center gap-0.5" onclick="jumpToMinute(255)">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span> [NOW T+04:15]
+          </span>
+<span class="hover:text-on-surface cursor-pointer hidden md:inline" onclick="jumpToMinute(330)">[TARGET LOITER T+05:30]</span>
+<span class="hover:text-on-surface cursor-pointer" onclick="jumpToMinute(465)">[RTB T+07:45]</span>
+</div>
+</div>
+<!-- Scrubber Playback Controls & Utility Trigger -->
+<div class="flex flex-wrap items-center justify-between gap-unit-sm pt-unit-2xs border-t border-outline-variant/30">
+<div class="flex items-center gap-unit-xs">
+<button class="w-7 h-7 bg-surface-container-high border border-outline-variant text-on-surface rounded flex items-center justify-center hover:border-primary hover:text-primary transition-colors" id="btn-scrub-play" onclick="togglePlayback()" title="Play / Pause Telemetry Stream" type="button">
+<span class="material-symbols-outlined text-[16px]" id="icon-play">play_arrow</span>
+</button>
+<div class="flex items-center bg-surface-container-high border border-outline-variant rounded font-label-code text-label-code p-0.5">
+<button class="px-1.5 py-0.5 rounded text-primary font-bold" onclick="setSpeed(1)" type="button">1x</button>
+<button class="px-1.5 py-0.5 rounded text-outline hover:text-on-surface" onclick="setSpeed(5)" type="button">5x</button>
+<button class="px-1.5 py-0.5 rounded text-outline hover:text-on-surface" onclick="setSpeed(10)" type="button">10x</button>
+</div>
+<button class="px-unit-xs py-1 bg-tertiary-container/30 border border-tertiary/50 text-tertiary rounded font-label-code text-label-code hover:bg-tertiary-container/50 transition-colors flex items-center gap-1" onclick="jumpToMinute(232)" type="button">
+<span class="material-symbols-outlined text-[13px]">crisis_alert</span>
+            JUMP TO ANOMALY (T+03:52)
+          </button>
+</div>
+<div class="flex items-center gap-unit-md font-label-micro text-label-micro text-outline">
+<span>BLACKBOX DATA: DUAL SSD WRITE-THROUGH</span>
+<span class="text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> 0 PACKETS DROPPED
+          </span>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- CLIENT-SIDE OPERATOR WORKSTATION SCRIPT -->
+<script>
+  let isPlaying = false;
+  let playInterval = null;
+  let playbackSpeed = 1;
+
+  function toggleFactorsPanel() {
+    const content = document.getElementById('factors-content');
+    const label = document.getElementById('factors-toggle-label');
+    const icon = document.getElementById('factors-toggle-icon');
+    
+    if (content.classList.contains('hidden')) {
+      content.classList.remove('hidden');
+      label.textContent = '[EXPANDED - CLICK TO COLLAPSE]';
+      icon.classList.remove('rotate-180');
+    } else {
+      content.classList.add('hidden');
+      label.textContent = '[COLLAPSED - CLICK TO EXPAND]';
+      icon.classList.add('rotate-180');
+    }
+  }
+
+  function setEngineState(state) {
+    const card = document.getElementById('engine-health-card');
+    const title = document.getElementById('engine-state-title');
+    const rulVal = document.getElementById('rul-hours-val');
+    const factorsPanel = document.getElementById('factors-panel');
+
+    // Button states
+    document.getElementById('btn-state-nominal').className = "px-unit-sm py-0.5 font-label-code text-label-code rounded text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1";
+    document.getElementById('btn-state-degraded').className = "px-unit-sm py-0.5 font-label-code text-label-code rounded text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1";
+    document.getElementById('btn-state-critical').className = "px-unit-sm py-0.5 font-label-code text-label-code rounded text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1";
+
+    if (state === 'nominal') {
+      document.getElementById('btn-state-nominal').className = "px-unit-sm py-0.5 font-label-code text-label-code rounded bg-secondary-container/30 text-secondary font-bold transition-colors flex items-center gap-1";
+      card.className = "lg:col-span-4 bg-surface-container-low p-unit-md border-2 border-secondary/70 rounded flex flex-col justify-between relative overflow-hidden transition-all duration-300";
+      title.className = "font-headline-lg text-headline-lg text-secondary uppercase mt-1 tracking-wider flex items-center gap-2";
+      title.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span> NOMINAL (OPTIMAL)';
+      rulVal.textContent = "07h 48m";
+      rulVal.className = "font-display-lg text-display-lg text-secondary font-bold tracking-tight";
+      factorsPanel.classList.add('opacity-40');
+    } else if (state === 'degraded') {
+      document.getElementById('btn-state-degraded').className = "px-unit-sm py-0.5 font-label-code text-label-code rounded bg-tertiary-container/30 text-tertiary font-bold transition-colors flex items-center gap-1";
+      card.className = "lg:col-span-4 bg-surface-container-low p-unit-md border-2 border-tertiary/70 rounded flex flex-col justify-between relative overflow-hidden transition-all duration-300";
+      title.className = "font-headline-lg text-headline-lg text-tertiary uppercase mt-1 tracking-wider flex items-center gap-2";
+      title.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-ping"></span> DEGRADED (CAUTION)';
+      rulVal.textContent = "04h 18m";
+      rulVal.className = "font-display-lg text-display-lg text-tertiary font-bold tracking-tight";
+      factorsPanel.classList.remove('opacity-40');
+    } else if (state === 'critical') {
+      document.getElementById('btn-state-critical').className = "px-unit-sm py-0.5 font-label-code text-label-code rounded bg-error-container/40 text-error font-bold transition-colors flex items-center gap-1";
+      card.className = "lg:col-span-4 bg-surface-container-low p-unit-md border-2 border-error rounded flex flex-col justify-between relative overflow-hidden transition-all duration-300 shadow-[0_0_20px_rgba(255,180,171,0.25)]";
+      title.className = "font-headline-lg text-headline-lg text-error uppercase mt-1 tracking-wider flex items-center gap-2";
+      title.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-error animate-ping"></span> CRITICAL EMERGENCY';
+      rulVal.textContent = "01h 14m";
+      rulVal.className = "font-display-lg text-display-lg text-error font-bold tracking-tight";
+      factorsPanel.classList.remove('opacity-40');
+    }
+  }
+
+  function acknowledgeCaution() {
+    alert('OPERATOR ACKNOWLEDGED ENGINE CAUTION #EHM-8492. AUDIBLE CHIME MUTED FOR 15 MINUTES.');
+  }
+
+  function updateScrubber(minuteVal) {
+    const hours = String(Math.floor(minuteVal / 60)).padStart(2, '0');
+    const mins = String(minuteVal % 60).padStart(2, '0');
+    const clock = document.getElementById('scrubber-clock');
+    if (clock) {
+      clock.textContent = `${hours}:${mins}:00`;
+    }
+  }
+
+  function jumpToMinute(minuteVal) {
+    const slider = document.getElementById('timeline-range-slider');
+    if (slider) {
+      slider.value = minuteVal;
+      updateScrubber(minuteVal);
+    }
+  }
+
+  function togglePlayback() {
+    const playIcon = document.getElementById('icon-play');
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      playIcon.textContent = 'pause';
+      playInterval = setInterval(() => {
+        const slider = document.getElementById('timeline-range-slider');
+        if (slider) {
+          let nextVal = parseInt(slider.value) + 1;
+          if (nextVal > 480) nextVal = 0;
+          slider.value = nextVal;
+          updateScrubber(nextVal);
+        }
+      }, 1000 / playbackSpeed);
+    } else {
+      playIcon.textContent = 'play_arrow';
+      clearInterval(playInterval);
+    }
+  }
+
+  function setSpeed(rate) {
+    playbackSpeed = rate;
+    if (isPlaying) {
+      clearInterval(playInterval);
+      playInterval = setInterval(() => {
+        const slider = document.getElementById('timeline-range-slider');
+        if (slider) {
+          let nextVal = parseInt(slider.value) + 1;
+          if (nextVal > 480) nextVal = 0;
+          slider.value = nextVal;
+          updateScrubber(nextVal);
+        }
+      }, 1000 / playbackSpeed);
+    }
+  }
+</script></main></div></body></html>
