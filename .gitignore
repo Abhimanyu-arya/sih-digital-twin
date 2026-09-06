@@ -6,3 +6,6 @@ node_modules/
 .DS_Store
 dashboard/build/
 dashboard/dist/
+
+# Generated dataset (reproducible via generate_dataset.py with seed=42)
+engine_simulation/data/dataset/mission_*.csv

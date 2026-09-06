@@ -329,6 +329,83 @@ def simulate_mission(duration_s=1800, sample_rate_hz=1.0, cruise_rpm=5000,
     return records
 
 
+def simulate_mission_variable_profile(duration_s=1800, sample_rate_hz=1.0,
+                                       cruise_rpm=5000, altitude_m=1500.0,
+                                       rpm_schedule=None,
+                                       fault_type=None, fault_start_s=None,
+                                       fault_ramp_s=300):
+    """Generate a mission with mid-cruise RPM step-changes (rapid throttle
+    transitions), directly addressing the SIH problem statement's requirement.
+
+    rpm_schedule: list of (start_time_s, target_rpm, ramp_s) tuples defining
+        RPM changes during the cruise phase. Between transitions the engine
+        holds the last commanded RPM. If None, behaves identically to
+        simulate_mission (single cruise RPM, no transitions).
+    """
+    climb_s = 120.0
+    descent_s = 120.0
+
+    # Pre-compute the RPM timeline from the schedule.
+    # Each entry: (t_start, t_end_of_ramp, from_rpm, to_rpm)
+    transitions = []
+    if rpm_schedule:
+        for seg_start, seg_rpm, seg_ramp in sorted(rpm_schedule, key=lambda x: x[0]):
+            transitions.append((seg_start, seg_start + seg_ramp, seg_rpm))
+
+    def _get_cruise_rpm(t):
+        """Resolve the commanded RPM at time `t` during the cruise phase,
+        accounting for any scheduled transitions."""
+        if not transitions:
+            return cruise_rpm
+        current_target = cruise_rpm
+        for t_start, t_end, target in transitions:
+            if t < t_start:
+                break
+            elif t <= t_end:
+                # Mid-ramp: linearly interpolate
+                prev_target = current_target
+                frac = (t - t_start) / max(1.0, t_end - t_start)
+                return prev_target + frac * (target - prev_target)
+            else:
+                current_target = target
+        return current_target
+
+    records = []
+    n_samples = int(duration_s * sample_rate_hz)
+
+    for i in range(n_samples):
+        t = i / sample_rate_hz
+
+        # Phase: climb, cruise (with transitions), descent
+        if t < climb_s:
+            target_rpm = _get_cruise_rpm(climb_s)  # climb toward first cruise rpm
+            rpm = RPM_IDLE + (target_rpm - RPM_IDLE) * (t / climb_s)
+            alt = altitude_m * (t / climb_s)
+        elif t > duration_s - descent_s:
+            frac = (duration_s - t) / descent_s
+            target_rpm = _get_cruise_rpm(duration_s - descent_s)
+            rpm = RPM_IDLE + (target_rpm - RPM_IDLE) * frac
+            alt = altitude_m * frac
+        else:
+            rpm = _get_cruise_rpm(t)
+            alt = altitude_m
+
+        state = steady_state_engine(rpm, altitude_m=alt)
+
+        fault_label = "none"
+        if fault_type and fault_start_s is not None and t >= fault_start_s:
+            progress = min(1.0, (t - fault_start_s) / fault_ramp_s)
+            state = FAULT_FUNCTIONS[fault_type](state, progress)
+            fault_label = fault_type if progress > 0.05 else "none"
+
+        state = add_noise(state)
+        state["timestamp"] = round(t, 2)
+        state["fault_label"] = fault_label
+        records.append(state)
+
+    return records
+
+
 def save_records(records, path):
     if path.endswith(".json"):
         with open(path, "w") as f:
