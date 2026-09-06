@@ -10,3 +10,4 @@ dashboard/dist/
 # Generated dataset (reproducible via generate_dataset.py with seed=42)
 engine_simulation/data/dataset/mission_*.csv
 engine_simulation/data/dataset/rul_labels.csv
+engine_simulation/data/dataset/residuals_*.csv
