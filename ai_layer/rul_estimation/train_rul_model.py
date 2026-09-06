@@ -49,7 +49,8 @@ RAW_FEATURES = ["rpm", "cht_c", "egt_c", "oil_pressure_bar", "oil_temp_c", "fuel
 RESIDUAL_FEATURES = ["cht_c_residual", "cht_c_z", "egt_c_residual", "egt_c_z", "oil_pressure_bar_residual", "oil_pressure_bar_z", 
                      "oil_temp_c_residual", "oil_temp_c_z", "fuel_flow_lph_residual", "fuel_flow_lph_z", "vibration_g_residual", "vibration_g_z", 
                      "alternator_v_residual", "alternator_v_z", "injection_timing_deg_residual", "injection_timing_deg_z", "rpm_residual", "rpm_z"]
-ALL_FEATURES = RAW_FEATURES + RESIDUAL_FEATURES
+ELAPSED_FEATURE = ["time_since_detection"]
+ALL_FEATURES = RAW_FEATURES + RESIDUAL_FEATURES + ELAPSED_FEATURE
 
 
 class RULDataset(Dataset):
@@ -163,6 +164,9 @@ def main():
     
     all_data = []
     
+    first_det_df = pd.read_csv(os.path.join(DATASET_DIR, "first_detections.csv"))
+    det_map = dict(zip(first_det_df["mission_id"], first_det_df["t_first_detected"]))
+    
     for mid in mission_ids:
         raw_df = pd.read_csv(os.path.join(DATASET_DIR, f"{mid}.csv"))
         res_df = pd.read_csv(os.path.join(DATASET_DIR, f"residuals_{mid.replace('mission_', '')}.csv"))
@@ -173,24 +177,35 @@ def main():
         merged = pd.merge(merged, lbl_df, on="timestamp")
         merged["fault_type"] = fault_type_map[mid]
         
-        all_data.append(merged)
-        
-        if mid in train_ids:
-            train_dfs.append(merged)
-        elif mid in val_ids:
-            val_dfs.append(merged)
+        # Filter to t >= t_first_detected (post-detection period only)
+        if mid in det_map and pd.notnull(det_map[mid]):
+            t_det = det_map[mid]
+            merged["time_since_detection"] = merged["timestamp"] - t_det
+            merged = merged[merged["timestamp"] >= t_det].reset_index(drop=True)
         else:
-            test_dfs.append(merged)
+            merged["time_since_detection"] = 0.0
             
-    train_df = pd.concat(train_dfs, ignore_index=True)
-    val_df = pd.concat(val_dfs, ignore_index=True)
-    test_df = pd.concat(test_dfs, ignore_index=True)
-    
+        if len(merged) >= WINDOW_SIZE:
+            all_data.append(merged)
+            
+            if mid in train_ids:
+                train_dfs.append(merged)
+            elif mid in val_ids:
+                val_dfs.append(merged)
+            else:
+                test_dfs.append(merged)
+            
     # 2. Scale Features (Fit on train only)
     scaler = StandardScaler()
-    train_df[ALL_FEATURES] = scaler.fit_transform(train_df[ALL_FEATURES])
-    val_df[ALL_FEATURES] = scaler.transform(val_df[ALL_FEATURES])
-    test_df[ALL_FEATURES] = scaler.transform(test_df[ALL_FEATURES])
+    train_df = pd.concat(train_dfs, ignore_index=True)
+    scaler.fit(train_df[ALL_FEATURES])
+    
+    for df in train_dfs:
+        df[ALL_FEATURES] = scaler.transform(df[ALL_FEATURES])
+    for df in val_dfs:
+        df[ALL_FEATURES] = scaler.transform(df[ALL_FEATURES])
+    for df in test_dfs:
+        df[ALL_FEATURES] = scaler.transform(df[ALL_FEATURES])
     
     # 3. Create Windows
     def build_dataset(dfs_list):

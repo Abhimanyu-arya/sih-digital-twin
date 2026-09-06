@@ -26,16 +26,20 @@ def process_timestamp(row_dict, history):
         dict: The anomaly detection results for this timestamp.
     """
     # 1. Compute baseline expected values
-    baseline = steady_state_engine(rpm=row_dict['rpm'], altitude_m=row_dict['altitude_m'])
+    rpm_cmd = row_dict.get('commanded_rpm', row_dict['rpm'])
+    baseline = steady_state_engine(rpm=rpm_cmd, altitude_m=row_dict['altitude_m'])
     
     results = {
         'timestamp': row_dict['timestamp'],
         'channels': {}
     }
     
+    # Also check rpm channel if commanded_rpm is present
     for channel, std in NOISE_STD.items():
-        if channel in ['rpm', 'altitude_m']: 
-            continue # We use rpm and altitude_m as independent variables
+        if channel in ['altitude_m', 'commanded_rpm']: 
+            continue
+        if channel == 'rpm' and 'commanded_rpm' not in row_dict:
+            continue # If no commanded_rpm, rpm is independent variable
             
         if channel not in row_dict:
             continue
