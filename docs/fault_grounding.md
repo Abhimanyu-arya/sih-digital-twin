@@ -7,13 +7,13 @@ directly rather than discovered by them.
 
 | Fault mode                        | Status in this project             | Grounding                                                                 |
 |------------------------------------|--------------------------------------|------------------------------------------------------------------------------|
-| Oil pressure / lubrication fault   | **Implemented, manual-grounded**    | Rotax manual abnormal-operation section (low/high oil pressure causes)      |
+| Oil pressure / lubrication fault   | **Implemented, manual-grounded**    | Rotax 912 Series Operator's Manual, Chapter 4.4 'Oil pressure/Fuel pressure' (4.4.1 Oil pressure below minimum, 4.4.2 Oil pressure above permitted range at low ambient temperatures)      |
 | Misfire / ignition fault           | **Implemented, manual-grounded**    | Rotax manual ignition check (300 rpm max single-circuit drop)              |
-| Combustion instability             | Planned                             | To be grounded via carburetor icing section (documented performance/mixture change) |
+| Combustion instability             | **Implemented, partially grounded** | Carburetor icing is a well-documented general aviation piston engine phenomenon but is not covered in this specific Rotax 912 manual's abnormal-operation chapter; the fault model is based on general published carburetor-icing behavior (power/EGT drop, mixture enrichment) |
 | Sensor drift                       | **Implemented, synthetic**          | No manufacturer analog — explicitly stated as synthetic                     |
 | Injector abnormality               | Planned                             | To be grounded via fuel pressure limits (0.15–0.4 bar) + fuel consumption deviation |
-| Alternator / electrical fault      | Planned                             | To be grounded via electrical system chapter charging description          |
-| Overheating / cooling fault        | Planned                             | To be grounded via CHT/coolant exceedance sections and real max thresholds  |
+| Alternator / electrical fault      | **Implemented, manual-grounded**    | Rotax 912 Series Operator's Manual, Chapter 7.4 'Electric system' (System Description chapter)          |
+| Overheating / cooling fault        | **Implemented, manual-grounded**    | Rotax 912 Series Operator's Manual, Chapter 4.3 'Temperature' (4.3.1 Exceeding max. admissible cooling system temperature, 4.3.2 Exceeding max. admissible cylinder head temperature, 4.3.4 Exceeding max. admissible oil temperature)  |
 | Injection timing fault             | Planned                             | Approximated only — real ECU maps are proprietary; will be stated as a limitation |
 
 ## How to talk about this in the pitch

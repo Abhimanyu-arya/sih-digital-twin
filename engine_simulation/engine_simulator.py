@@ -175,7 +175,7 @@ def steady_state_engine(rpm, altitude_m=0.0, oat_c=15.0):
 def inject_oil_pressure_fault(state, progress):
     """Lubrication-system fault: gradual oil pressure loss with a compensatory
     rise in oil temperature, consistent with the manual's 'oil pressure below
-    minimum' abnormal-operation guidance (Chapter 4.4). `progress` in [0, 1]
+    minimum' abnormal-operation guidance (Chapter 4.4 'Oil pressure/Fuel pressure' (4.4.1 Oil pressure below minimum, 4.4.2 Oil pressure above permitted range at low ambient temperatures)). `progress` in [0, 1]
     represents how far into the developing fault we are."""
     state = dict(state)
     pressure_loss = progress * 2.0          # bar, drifting toward/below the 0.8 bar minimum
@@ -211,10 +211,48 @@ def inject_sensor_drift_fault(state, progress, channel="oil_pressure_bar"):
     return state
 
 
+def inject_combustion_instability_fault(state, progress):
+    """Combustion instability fault (carburetor icing). This model is based on
+    general aviation piston-engine carburetor icing behavior (gradual power and EGT drop, richer mixture leading to increased fuel flow, and increased RPM variance). Not directly grounded in the Rotax 912 manual.
+    `progress` in [0, 1] indicates fault development.
+    """
+    state = dict(state)
+    # Power and EGT drop
+    state["egt_c"] -= progress * 50  # gradual EGT decrease
+    # Fuel flow increase due to richer mixture
+    state["fuel_flow_lph"] += progress * 2.0
+    # Increase RPM variance (add zero-mean noise)
+    state["rpm"] += random.gauss(0, 10 * progress)
+    return state
+
+def inject_overheating_fault(state, progress):
+    """Overheating fault: gradual increase in cylinder head temperature (CHT) and oil temperature.
+    Grounded in Rotax 912 Series Operator's Manual, Chapter 4.3 'Temperature' (specifically 4.3.1 Exceeding max. admissible cooling system temperature, 4.3.2 Exceeding max. admissible cylinder head temperature, 4.3.4 Exceeding max. admissible oil temperature).
+    `progress` in [0, 1] indicates fault development.
+    """
+    state = dict(state)
+    # Increase CHT and oil temperature proportionally
+    state["cht_c"] += progress * 30  # approach/exceed max thresholds
+    state["oil_temp_c"] += progress * 25
+    return state
+
+def inject_alternator_fault(state, progress):
+    """Alternator/electrical fault: gradual drop in alternator voltage.
+    Grounded in Rotax 912 Series Operator's Manual, Chapter 7.4 'Electric system' (System Description chapter).
+    `progress` in [0, 1] indicates fault development.
+    """
+    state = dict(state)
+    # Voltage drop up to ~3V reduction
+    state["alternator_v"] = max(10.0, state["alternator_v"] - progress * 3.0)
+    return state
+
 FAULT_FUNCTIONS = {
     "oil_pressure_fault": inject_oil_pressure_fault,
     "misfire_fault": inject_misfire_fault,
     "sensor_drift_fault": inject_sensor_drift_fault,
+    "combustion_instability_fault": inject_combustion_instability_fault,
+    "overheating_fault": inject_overheating_fault,
+    "alternator_fault": inject_alternator_fault,
 }
 
 
@@ -309,33 +347,36 @@ def save_records(records, path):
 # ---------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # A 30-minute mission where an oil pressure (lubrication) fault starts
-    # developing at the 10-minute mark and fully manifests by ~15 minutes.
-    mission = simulate_mission(
-        duration_s=1800,
-        sample_rate_hz=1.0,
-        cruise_rpm=5000,
-        altitude_m=2000,
-        fault_type="oil_pressure_fault",
-        fault_start_s=600,
-        fault_ramp_s=300,
-    )
-    save_records(mission, "/home/claude/demo_mission_oil_fault.csv")
-    save_records(mission, "/home/claude/demo_mission_oil_fault.json")
+    import os
+    os.makedirs("engine_simulation/data", exist_ok=True)
 
-    # A second demo mission with a misfire fault for comparison.
-    mission2 = simulate_mission(
-        duration_s=1800,
-        sample_rate_hz=1.0,
-        cruise_rpm=5000,
-        altitude_m=2000,
-        fault_type="misfire_fault",
-        fault_start_s=800,
-        fault_ramp_s=200,
-    )
-    save_records(mission2, "/home/claude/demo_mission_misfire_fault.csv")
+    demos = [
+        ("oil_pressure_fault",            600, 300),
+        ("misfire_fault",                  800, 200),
+        ("combustion_instability_fault",   600, 300),
+        ("overheating_fault",              600, 600),
+        ("alternator_fault",               600, 300),
+    ]
 
-    print(f"Generated {len(mission)} records for oil pressure fault mission.")
-    print(f"Generated {len(mission2)} records for misfire fault mission.")
-    print("Sample healthy record:", mission[300])
-    print("Sample faulted record (mid-fault):", mission[750])
+    for fault_name, start_s, ramp_s in demos:
+        mission = simulate_mission(
+            duration_s=1800,
+            sample_rate_hz=1.0,
+            cruise_rpm=5000,
+            altitude_m=2000,
+            fault_type=fault_name,
+            fault_start_s=start_s,
+            fault_ramp_s=ramp_s,
+        )
+        tag = fault_name.replace("_fault", "")
+        save_records(mission, f"engine_simulation/data/demo_mission_{tag}_fault.csv")
+        save_records(mission, f"engine_simulation/data/demo_mission_{tag}_fault.json")
+        print(f"[{fault_name}] Generated {len(mission)} records  "
+              f"-> engine_simulation/data/demo_mission_{tag}_fault.{{csv,json}}")
+
+    # Quick sanity print from the first mission
+    first = simulate_mission(duration_s=1800, cruise_rpm=5000, altitude_m=2000,
+                             fault_type="oil_pressure_fault", fault_start_s=600,
+                             fault_ramp_s=300)
+    print("\nSample healthy record (t=300s):", first[300])
+    print("Sample faulted record (t=750s):", first[750])
