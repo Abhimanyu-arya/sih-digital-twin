@@ -178,7 +178,7 @@ def inject_oil_pressure_fault(state, progress):
     minimum' abnormal-operation guidance (Chapter 4.4 'Oil pressure/Fuel pressure' (4.4.1 Oil pressure below minimum, 4.4.2 Oil pressure above permitted range at low ambient temperatures)). `progress` in [0, 1]
     represents how far into the developing fault we are."""
     state = dict(state)
-    pressure_loss = progress * 2.0          # bar, drifting toward/below the 0.8 bar minimum
+    pressure_loss = progress * 4.0          # bar, drifting toward/below the 0.8 bar minimum
     state["oil_pressure_bar"] = max(0.3, state["oil_pressure_bar"] - pressure_loss)
     state["oil_temp_c"] += progress * 20     # friction/heat rises as lubrication degrades
     state["vibration_g"] += progress * 0.05  # increased mechanical wear noise
@@ -192,10 +192,13 @@ def inject_misfire_fault(state, progress, cylinder=2):
     off that reference figure, plus the expected EGT/vibration signature of
     a dead or weak cylinder (unburned fuel exits hotter/cooler depending on
     misfire type; here modeled as a cooling of the affected cylinder's EGT
-    and a rise in vibration from the resulting imbalance)."""
+    and a rise in vibration from the resulting imbalance).
+    Note: At full progress, this exceeds the Rotax manual's 300 rpm reference
+    figure because it models progression to actual failure, not just the
+    ignition-check scenario."""
     state = dict(state)
     max_rpm_drop_ref = 300  # from the manual's ignition check limit
-    state["rpm"] -= progress * max_rpm_drop_ref * 0.5
+    state["rpm"] -= progress * max_rpm_drop_ref * 1.2
     state["egt_c"] -= progress * 120   # affected cylinder runs cooler (incomplete combustion)
     state["vibration_g"] += progress * 0.12  # firing imbalance -> vibration signature
     state["fault_cylinder"] = cylinder
@@ -218,7 +221,7 @@ def inject_combustion_instability_fault(state, progress):
     """
     state = dict(state)
     # Power and EGT drop
-    state["egt_c"] -= progress * 50  # gradual EGT decrease
+    state["egt_c"] -= progress * 200  # gradual EGT decrease
     # Fuel flow increase due to richer mixture
     state["fuel_flow_lph"] += progress * 2.0
     # Increase RPM variance (add zero-mean noise)
@@ -314,6 +317,7 @@ def simulate_mission(duration_s=1800, sample_rate_hz=1.0, cruise_rpm=5000,
             alt = altitude_m
 
         state = steady_state_engine(rpm, altitude_m=alt)
+        state["commanded_rpm"] = rpm
 
         fault_label = "none"
         if fault_type and fault_start_s is not None and t >= fault_start_s:
@@ -391,6 +395,7 @@ def simulate_mission_variable_profile(duration_s=1800, sample_rate_hz=1.0,
             alt = altitude_m
 
         state = steady_state_engine(rpm, altitude_m=alt)
+        state["commanded_rpm"] = rpm
 
         fault_label = "none"
         if fault_type and fault_start_s is not None and t >= fault_start_s:

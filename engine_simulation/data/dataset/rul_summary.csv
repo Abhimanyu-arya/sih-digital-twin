@@ -1,0 +1,181 @@
+mission_id,fault_type,t_failure,failure_reached,excluded_reason
+mission_000,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_001,none,,False,healthy
+mission_002,none,,False,healthy
+mission_003,none,,False,healthy
+mission_004,none,,False,healthy
+mission_005,none,,False,healthy
+mission_006,alternator_fault,1173.0,True,
+mission_007,oil_pressure_fault,742.0,True,
+mission_008,alternator_fault,1093.0,True,
+mission_009,none,,False,healthy
+mission_010,alternator_fault,589.0,True,
+mission_011,none,,False,healthy
+mission_012,overheating_fault,1332.0,True,
+mission_013,none,,False,healthy
+mission_014,oil_pressure_fault,600.0,True,
+mission_015,oil_pressure_fault,1156.0,True,
+mission_016,oil_pressure_fault,1291.0,True,
+mission_017,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_018,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_019,alternator_fault,544.0,True,
+mission_020,combustion_instability_fault,1103.0,True,
+mission_021,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_022,none,,False,healthy
+mission_023,combustion_instability_fault,820.0,True,
+mission_024,oil_pressure_fault,1228.0,True,
+mission_025,overheating_fault,690.0,True,
+mission_026,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_027,alternator_fault,579.0,True,
+mission_028,overheating_fault,1267.0,True,
+mission_029,overheating_fault,1239.0,True,
+mission_030,none,,False,healthy
+mission_031,none,,False,healthy
+mission_032,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_033,misfire_fault,644.0,True,
+mission_034,none,,False,healthy
+mission_035,misfire_fault,565.0,True,
+mission_036,alternator_fault,491.0,True,
+mission_037,combustion_instability_fault,1145.0,True,
+mission_038,overheating_fault,788.0,True,
+mission_039,none,,False,healthy
+mission_040,misfire_fault,1279.0,True,
+mission_041,none,,False,healthy
+mission_042,oil_pressure_fault,1150.0,True,
+mission_043,oil_pressure_fault,848.0,True,
+mission_044,misfire_fault,964.0,True,
+mission_045,alternator_fault,1232.0,True,
+mission_046,overheating_fault,1365.0,True,
+mission_047,combustion_instability_fault,1256.0,True,
+mission_048,none,,False,healthy
+mission_049,oil_pressure_fault,1311.0,True,
+mission_050,none,,False,healthy
+mission_051,alternator_fault,1113.0,True,
+mission_052,oil_pressure_fault,1068.0,True,
+mission_053,combustion_instability_fault,1056.0,True,
+mission_054,misfire_fault,1012.0,True,
+mission_055,overheating_fault,879.0,True,
+mission_056,overheating_fault,502.0,True,
+mission_057,none,,False,healthy
+mission_058,overheating_fault,942.0,True,
+mission_059,none,,False,healthy
+mission_060,oil_pressure_fault,693.0,True,
+mission_061,none,,False,healthy
+mission_062,combustion_instability_fault,984.0,True,
+mission_063,combustion_instability_fault,1259.0,True,
+mission_064,misfire_fault,846.0,True,
+mission_065,overheating_fault,1343.0,True,
+mission_066,alternator_fault,468.0,True,
+mission_067,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_068,oil_pressure_fault,861.0,True,
+mission_069,oil_pressure_fault,651.0,True,
+mission_070,none,,False,healthy
+mission_071,none,,False,healthy
+mission_072,misfire_fault,1220.0,True,
+mission_073,overheating_fault,1063.0,True,
+mission_074,alternator_fault,763.0,True,
+mission_075,combustion_instability_fault,1237.0,True,
+mission_076,misfire_fault,1116.0,True,
+mission_077,alternator_fault,662.0,True,
+mission_078,none,,False,healthy
+mission_079,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_080,oil_pressure_fault,1393.0,True,
+mission_081,none,,False,healthy
+mission_082,overheating_fault,963.0,True,
+mission_083,none,,False,healthy
+mission_084,oil_pressure_fault,944.0,True,
+mission_085,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_086,none,,False,healthy
+mission_087,misfire_fault,1299.0,True,
+mission_088,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_089,overheating_fault,1376.0,True,
+mission_090,overheating_fault,716.0,True,
+mission_091,misfire_fault,1291.0,True,
+mission_092,misfire_fault,1280.0,True,
+mission_093,oil_pressure_fault,613.0,True,
+mission_094,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_095,misfire_fault,689.0,True,
+mission_096,oil_pressure_fault,693.0,True,
+mission_097,combustion_instability_fault,1119.0,True,
+mission_098,alternator_fault,883.0,True,
+mission_099,none,,False,healthy
+mission_100,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_101,combustion_instability_fault,1158.0,True,
+mission_102,none,,False,healthy
+mission_103,combustion_instability_fault,665.0,True,
+mission_104,overheating_fault,934.0,True,
+mission_105,combustion_instability_fault,1427.0,True,
+mission_106,none,,False,healthy
+mission_107,combustion_instability_fault,1297.0,True,
+mission_108,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_109,none,,False,healthy
+mission_110,none,,False,healthy
+mission_111,oil_pressure_fault,596.0,True,
+mission_112,none,,False,healthy
+mission_113,misfire_fault,561.0,True,
+mission_114,combustion_instability_fault,928.0,True,
+mission_115,alternator_fault,1242.0,True,
+mission_116,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_117,none,,False,healthy
+mission_118,none,,False,healthy
+mission_119,misfire_fault,997.0,True,
+mission_120,oil_pressure_fault,753.0,True,
+mission_121,misfire_fault,1023.0,True,
+mission_122,none,,False,healthy
+mission_123,none,,False,healthy
+mission_124,misfire_fault,1031.0,True,
+mission_125,none,,False,healthy
+mission_126,combustion_instability_fault,657.0,True,
+mission_127,oil_pressure_fault,1123.0,True,
+mission_128,none,,False,healthy
+mission_129,none,,False,healthy
+mission_130,combustion_instability_fault,1085.0,True,
+mission_131,combustion_instability_fault,862.0,True,
+mission_132,none,,False,healthy
+mission_133,misfire_fault,468.0,True,
+mission_134,none,,False,healthy
+mission_135,oil_pressure_fault,1178.0,True,
+mission_136,none,,False,healthy
+mission_137,alternator_fault,583.0,True,
+mission_138,combustion_instability_fault,1434.0,True,
+mission_139,combustion_instability_fault,720.0,True,
+mission_140,none,,False,healthy
+mission_141,misfire_fault,1116.0,True,
+mission_142,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_143,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_144,combustion_instability_fault,917.0,True,
+mission_145,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_146,none,,False,healthy
+mission_147,overheating_fault,470.0,True,
+mission_148,combustion_instability_fault,1349.0,True,
+mission_149,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_150,none,,False,healthy
+mission_151,none,,False,healthy
+mission_152,alternator_fault,582.0,True,
+mission_153,overheating_fault,722.0,True,
+mission_154,misfire_fault,1228.0,True,
+mission_155,alternator_fault,1250.0,True,
+mission_156,misfire_fault,607.0,True,
+mission_157,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_158,none,,False,healthy
+mission_159,overheating_fault,1184.0,True,
+mission_160,sensor_drift_fault,,False,sensor_drift (no physical EOL)
+mission_161,overheating_fault,784.0,True,
+mission_162,oil_pressure_fault,762.0,True,
+mission_163,alternator_fault,1238.0,True,
+mission_164,alternator_fault,1261.0,True,
+mission_165,none,,False,healthy
+mission_166,none,,False,healthy
+mission_167,none,,False,healthy
+mission_168,misfire_fault,1144.0,True,
+mission_169,overheating_fault,1246.0,True,
+mission_170,none,,False,healthy
+mission_171,overheating_fault,664.0,True,
+mission_172,none,,False,healthy
+mission_173,none,,False,healthy
+mission_174,alternator_fault,473.0,True,
+mission_175,alternator_fault,777.0,True,
+mission_176,alternator_fault,692.0,True,
+mission_177,none,,False,healthy
+mission_178,none,,False,healthy
+mission_179,sensor_drift_fault,,False,sensor_drift (no physical EOL)
