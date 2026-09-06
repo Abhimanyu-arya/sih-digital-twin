@@ -1,0 +1,11 @@
+# Engine simulation
+numpy
+pandas
+
+# AI layer (anomaly detection, RUL estimation)
+scikit-learn
+torch
+shap
+
+# Utilities
+matplotlib
