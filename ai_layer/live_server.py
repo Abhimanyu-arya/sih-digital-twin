@@ -243,38 +243,14 @@ class LiveSession:
 
         # 6. SHAP factors
         shap_factors = self.cached_shap_factors
-        if compute_shap and len(self.predictor.raw_window) == WINDOW_SIZE:
-            try:
-                explainer, features = _get_shap_explainer()
-                device = _device
-                w_arr = np.array(self.predictor.raw_window)
-                w_tensor = torch.tensor(w_arr, dtype=torch.float32).unsqueeze(0).transpose(1, 2).to(device)
-                s_vals = explainer.shap_values(w_tensor)
-                s_arr = np.squeeze(s_vals, axis=-1)
-                mean_imp = np.mean(np.abs(s_arr), axis=(0, 2))
-                top_indices = np.argsort(mean_imp)[::-1][:3]
-                top_scores = mean_imp[top_indices]
-                tot_score = sum(top_scores) + 1e-6
-                pcts = [int(round((sc / tot_score) * 100)) for sc in top_scores]
-                if sum(pcts) != 100 and len(pcts) == 3:
-                    pcts[0] += 100 - sum(pcts)
-
-                shap_factors = []
-                for rank_i, (idx_feat, w_pct) in enumerate(zip(top_indices, pcts), 1):
-                    f_name = features[idx_feat]
-                    s_factor = translate_feature_to_shap_factor(f_name, mean_imp[idx_feat], w_pct, rank_i, row_dict)
-                    shap_factors.append(s_factor)
-                self.cached_shap_factors = shap_factors
-            except Exception:
-                pass
-
-        if shap_factors is None:
+        if is_healthy or not self.predictor.anomaly_detected:
+            # During nominal flight, display nominal baseline factors (matches dashboard_export.py)
             shap_factors = [
                 {
                     "rank": 1, "weight_pct": 70, "severity": "NOMINAL BASELINE",
                     "feature_raw": "oil_pressure_bar",
                     "title": "Main Gallery Lubrication Stability",
-                    "description": "Main gallery oil pressure operating within nominal band.",
+                    "description": "Main gallery oil pressure operating within nominal 2.0–5.0 bar calibration band.",
                     "value_str": f"{row_dict.get('oil_pressure_bar', 3.5):.2f} bar (NOMINAL)",
                     "correlation": 0.98,
                 },
@@ -282,18 +258,72 @@ class LiveSession:
                     "rank": 2, "weight_pct": 20, "severity": "NOMINAL BASELINE",
                     "feature_raw": "cht_c",
                     "title": "Cylinder Head Thermal Equilibrium",
-                    "description": "Engine coolant and CHT operating within normal range.",
-                    "value_str": f"{row_dict.get('cht_c', 105):.1f} C (NOMINAL)",
+                    "description": "Engine coolant and CHT operating within normal thermal equilibrium (90–110°C).",
+                    "value_str": f"{row_dict.get('cht_c', 105):.1f}°C (NOMINAL)",
                     "correlation": 0.92,
                 },
                 {
                     "rank": 3, "weight_pct": 10, "severity": "NOMINAL BASELINE",
                     "feature_raw": "rpm",
                     "title": "Crankshaft Steady State Speed",
-                    "description": "Engine RPM locked to commanded throttle curve.",
+                    "description": "Engine RPM locked to commanded flight computer throttle curve.",
                     "value_str": f"{row_dict.get('rpm', 5000):.0f} RPM (NOMINAL)",
                     "correlation": 0.88,
                 },
+            ]
+        elif compute_shap and len(self.predictor.raw_window) == WINDOW_SIZE:
+            try:
+                explainer, features = _get_shap_explainer()
+                device = _device
+                w_arr = np.array(self.predictor.raw_window)
+                w_tensor = torch.tensor(w_arr, dtype=torch.float32).unsqueeze(0).transpose(1, 2).to(device)
+                s_vals = explainer.shap_values(w_tensor)
+                s_arr = np.squeeze(s_vals)
+                
+                if s_arr.ndim == 3:
+                    mean_imp = np.mean(np.abs(s_arr), axis=(0, 2))
+                elif s_arr.ndim == 2:
+                    mean_imp = np.mean(np.abs(s_arr), axis=1)
+
+                # Group/aggregate importance scores by physical sensor name
+                sensor_scores = {}
+                sensor_best_feature = {}
+
+                for idx_f, f_name in enumerate(features):
+                    score = mean_imp[idx_f]
+                    clean_f = f_name.replace("_residual", "").replace("_z", "")
+                    sensor_scores[clean_f] = sensor_scores.get(clean_f, 0.0) + score
+                    if clean_f not in sensor_best_feature or score > sensor_best_feature[clean_f][1]:
+                        sensor_best_feature[clean_f] = (f_name, score)
+
+                sorted_sensors = sorted(sensor_scores.items(), key=lambda x: x[1], reverse=True)
+                top_3_sensors = sorted_sensors[:3]
+
+                tot_score = sum(sc for _, sc in top_3_sensors) + 1e-6
+                pcts = [int(round((sc / tot_score) * 100)) for _, sc in top_3_sensors]
+                if sum(pcts) != 100 and len(pcts) == 3:
+                    pcts[0] += (100 - sum(pcts))
+
+                shap_factors = []
+                for rank_i, ((base_sens, sc), w_pct) in enumerate(zip(top_3_sensors, pcts), 1):
+                    best_f_name, best_f_score = sensor_best_feature[base_sens]
+                    s_factor = translate_feature_to_shap_factor(best_f_name, sc, w_pct, rank_i, row_dict)
+                    shap_factors.append(s_factor)
+
+                self.cached_shap_factors = shap_factors
+            except Exception:
+                pass
+
+        if shap_factors is None:
+            shap_factors = [
+                {
+                    "rank": 1, "weight_pct": 70, "severity": "ELEVATED TREND",
+                    "feature_raw": "oil_pressure_bar",
+                    "title": "Subsystem Telemetry Deviation",
+                    "description": "Subsystem parameter deviation detected by anomaly inference engine.",
+                    "value_str": f"{row_dict.get('oil_pressure_bar', 2.5):.2f} bar",
+                    "correlation": 0.90,
+                }
             ]
 
         return {

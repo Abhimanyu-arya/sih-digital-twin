@@ -419,20 +419,34 @@ def export_demo_missions():
                             w_arr = np.array(predictor.raw_window)
                             w_tensor = torch.tensor(w_arr, dtype=torch.float32).unsqueeze(0).transpose(1, 2).to(device)
                             s_vals = explainer.shap_values(w_tensor)
-                            s_arr = np.squeeze(s_vals, axis=-1)
-                            mean_imp = np.mean(np.abs(s_arr), axis=(0, 2))
-                            top_indices = np.argsort(mean_imp)[::-1][:3]
-                            top_scores = mean_imp[top_indices]
-                            tot_score = sum(top_scores) + 1e-6
-                            pcts = [int(round((sc / tot_score) * 100)) for sc in top_scores]
+                            s_arr = np.squeeze(s_vals)
+                            if s_arr.ndim == 3:
+                                mean_imp = np.mean(np.abs(s_arr), axis=(0, 2))
+                            elif s_arr.ndim == 2:
+                                mean_imp = np.mean(np.abs(s_arr), axis=1)
 
+                            sensor_scores = {}
+                            sensor_best_feature = {}
+
+                            for idx_f, f_name in enumerate(features):
+                                score = mean_imp[idx_f]
+                                clean_f = f_name.replace("_residual", "").replace("_z", "")
+                                sensor_scores[clean_f] = sensor_scores.get(clean_f, 0.0) + score
+                                if clean_f not in sensor_best_feature or score > sensor_best_feature[clean_f][1]:
+                                    sensor_best_feature[clean_f] = (f_name, score)
+
+                            sorted_sensors = sorted(sensor_scores.items(), key=lambda x: x[1], reverse=True)
+                            top_3_sensors = sorted_sensors[:3]
+
+                            tot_score = sum(sc for _, sc in top_3_sensors) + 1e-6
+                            pcts = [int(round((sc / tot_score) * 100)) for _, sc in top_3_sensors]
                             if sum(pcts) != 100 and len(pcts) == 3:
                                 pcts[0] += (100 - sum(pcts))
 
                             current_shap_factors = []
-                            for rank_i, (idx_feat, w_pct) in enumerate(zip(top_indices, pcts), 1):
-                                f_name = features[idx_feat]
-                                s_factor = translate_feature_to_shap_factor(f_name, mean_imp[idx_feat], w_pct, rank_i, row_dict)
+                            for rank_i, ((base_sens, sc), w_pct) in enumerate(zip(top_3_sensors, pcts), 1):
+                                best_f_name, best_f_score = sensor_best_feature[base_sens]
+                                s_factor = translate_feature_to_shap_factor(best_f_name, sc, w_pct, rank_i, row_dict)
                                 current_shap_factors.append(s_factor)
                             shap_factors = current_shap_factors
                     except Exception as e:
