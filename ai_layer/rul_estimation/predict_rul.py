@@ -15,11 +15,14 @@ import math
 # We need the model definition
 from train_rul_model import RULConvNet, WINDOW_SIZE
 
-def predict_on_window(window_df, model_path="rul_model.pt"):
+def predict_on_window(window_df, model_path=None):
     """
     Predict RUL for a single 60-timestep dataframe window.
-    window_df must have 60 rows and contain all required features.
+    window_df must have 60 rows and contain all required features (raw, residual, z-score, time_since_detection).
     """
+    if model_path is None:
+        model_path = os.path.join(os.path.dirname(__file__), "rul_model.pt")
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     if not os.path.exists(model_path):
@@ -68,29 +71,36 @@ def main():
     # that reached failure (e.g. oil_pressure_fault demo)
     
     demo_file = os.path.join(os.path.dirname(__file__), "../../engine_simulation/data/demo_mission_oil_pressure_fault.csv")
-    
     if not os.path.exists(demo_file):
-        print("Demo mission file not found for inference test.")
+        # Fallback to dataset directory
+        demo_file = os.path.join(os.path.dirname(__file__), "../../engine_simulation/data/dataset/mission_007.csv")
+        
+    if not os.path.exists(demo_file):
+        print(f"Demo mission file not found at {demo_file}.")
         return
         
     df = pd.read_csv(demo_file)
     
-    # We need residual features for the demo mission as well.
-    # We can compute them on the fly for the 60 rows.
+    # We need residual features and time_since_detection for the demo mission window.
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
     from engine_simulation.engine_simulator import steady_state_engine, NOISE_STD
     
-    # Let's just grab the last 60 seconds
+    # Let's grab the last 60 seconds
     window = df.tail(WINDOW_SIZE).copy()
     
-    channels = [c for c in NOISE_STD.keys() if c not in ["rpm", "altitude_m", "commanded_rpm"]]
+    # Determine anomaly detection timestamp (or fault start timestamp)
+    t_detected = 600.0  # Anomaly inception for mission_007 / oil_pressure_fault
     
-    # Compute residuals for window
+    channels = ["cht_c", "egt_c", "oil_pressure_bar", "oil_temp_c", "fuel_flow_lph", "vibration_g", "alternator_v", "injection_timing_deg"]
+    
+    # Compute residuals and time_since_detection for window
     for idx, row in window.iterrows():
-        baseline = steady_state_engine(rpm=row["commanded_rpm"], altitude_m=row["altitude_m"])
+        rpm_cmd = row.get("commanded_rpm", row["rpm"])
+        baseline = steady_state_engine(rpm=rpm_cmd, altitude_m=row["altitude_m"])
+        
         for ch in channels:
-            res = row[ch] - baseline[ch]
-            z = res / NOISE_STD[ch]
+            res = row[ch] - baseline.get(ch, row[ch])
+            z = res / NOISE_STD.get(ch, 1.0)
             window.at[idx, f"{ch}_residual"] = res
             window.at[idx, f"{ch}_z"] = z
             
@@ -99,6 +109,10 @@ def main():
         z_rpm = res_rpm / NOISE_STD["rpm"]
         window.at[idx, "rpm_residual"] = res_rpm
         window.at[idx, "rpm_z"] = z_rpm
+
+        # time_since_detection
+        ts = row["timestamp"]
+        window.at[idx, "time_since_detection"] = max(0.0, ts - t_detected)
         
     model_path = os.path.join(os.path.dirname(__file__), "rul_model.pt")
     
@@ -107,7 +121,8 @@ def main():
     
     if prediction is not None:
         print(f"Predicted RUL: {prediction:.2f} seconds")
-        print("(Since this is the very end of a faulted mission, RUL should be close to 0)")
+        print("(Since this is near the end of a faulted mission, RUL should be low)")
 
 if __name__ == "__main__":
     main()
+
