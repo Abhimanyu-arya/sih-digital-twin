@@ -15,16 +15,19 @@ export default function App() {
   const [zuluClock, setZuluClock] = useState("");
   const [isDebugOpen, setIsDebugOpen] = useState(false);
 
-  // ── Replay mode state ──
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // ── Replay mode state: manifest + per-mission cache ──
+  const [manifest, setManifest] = useState(null);
+  const [loadedMissions, setLoadedMissions] = useState({});
+  const [loadingManifest, setLoadingManifest] = useState(true);
+  const [loadingMission, setLoadingMission] = useState(false);
   const [error, setError] = useState(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const playTimerRef = useRef(null);
 
-  // ── Live mode state (default 10x speed per requirement #3) ──
+  // ── Live mode state (default 10x speed) ──
   const [liveSpeed, setLiveSpeed] = useState(10);
   const live = useLiveStream('/ws/stream');
 
@@ -37,7 +40,7 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
-  // ── Load precomputed JSON for replay mode ──
+  // ── 1. Fetch lightweight mission manifest ──
   useEffect(() => {
     fetch('/demo_missions.json')
       .then((res) => {
@@ -45,18 +48,39 @@ export default function App() {
         return res.json();
       })
       .then((json) => {
-        setData(json);
+        setManifest(json);
         if (json.missions && json.missions.length > 0) {
           setSelectedMissionId(json.missions[0].mission_id);
         }
-        setLoading(false);
+        setLoadingManifest(false);
       })
       .catch((err) => {
-        console.error("Failed to load demo_missions.json:", err);
+        console.error("Failed to load demo_missions.json manifest:", err);
         setError(err.message);
-        setLoading(false);
+        setLoadingManifest(false);
       });
   }, []);
+
+  // ── 2. On-demand fetch of selected per-mission JSON file ──
+  useEffect(() => {
+    if (!selectedMissionId || mode !== "replay") return;
+    if (loadedMissions[selectedMissionId]) return; // already cached
+
+    setLoadingMission(true);
+    fetch(`/missions/${selectedMissionId}.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return res.json();
+      })
+      .then((missionData) => {
+        setLoadedMissions((prev) => ({ ...prev, [selectedMissionId]: missionData }));
+        setLoadingMission(false);
+      })
+      .catch((err) => {
+        console.error(`Failed to load /missions/${selectedMissionId}.json:`, err);
+        setLoadingMission(false);
+      });
+  }, [selectedMissionId, mode, loadedMissions]);
 
   // ── Reset replay state when mission changes ──
   useEffect(() => {
@@ -68,11 +92,12 @@ export default function App() {
   useEffect(() => {
     if (mode !== "replay") return;
     if (isPlaying) {
+      const activeMission = loadedMissions[selectedMissionId];
+      const maxFrames = activeMission?.telemetry?.length || 1;
       const intervalMs = Math.max(50, 1000 / playbackSpeed);
+
       playTimerRef.current = setInterval(() => {
         setCurrentIndex((prev) => {
-          const currentMission = data?.missions?.find(m => m.mission_id === selectedMissionId);
-          const maxFrames = currentMission?.telemetry?.length || 1;
           if (prev >= maxFrames - 1) {
             setIsPlaying(false);
             return prev;
@@ -86,14 +111,13 @@ export default function App() {
     return () => {
       if (playTimerRef.current) clearInterval(playTimerRef.current);
     };
-  }, [isPlaying, playbackSpeed, selectedMissionId, data, mode]);
+  }, [isPlaying, playbackSpeed, selectedMissionId, loadedMissions, mode]);
 
   // ── Mode switching ──
   const handleSetMode = (newMode) => {
     if (newMode === mode) return;
     if (newMode === "live") {
       setIsPlaying(false);
-      // Start live stream with 10x default speed
       live.start(selectedMissionId, liveSpeed);
     } else {
       live.stop();
@@ -107,7 +131,6 @@ export default function App() {
     setSelectedMissionId(mid);
     setCurrentIndex(0);
     setIsPlaying(false);
-    // Requirement #4: starting a new mission stream cleanly tears down the old session
     if (mode === "live") {
       live.start(mid, liveSpeed);
     }
@@ -124,17 +147,17 @@ export default function App() {
 
   const handleJumpToAnomaly = () => {
     if (mode !== "replay") return;
-    const currentMission = data?.missions?.find(m => m.mission_id === selectedMissionId);
-    if (currentMission && currentMission.t_first_detected) {
-      const idx = currentMission.telemetry.findIndex(f => f.timestamp >= currentMission.t_first_detected);
+    const activeMission = loadedMissions[selectedMissionId];
+    if (activeMission && activeMission.t_first_detected) {
+      const idx = activeMission.telemetry.findIndex(f => f.timestamp >= activeMission.t_first_detected);
       if (idx !== -1) {
         setCurrentIndex(idx);
       }
     }
   };
 
-  // ── Loading state ──
-  if (loading) {
+  // ── Loading manifest state ──
+  if (loadingManifest) {
     return (
       <div className="h-screen bg-background text-on-surface flex items-center justify-center flex-col gap-4 font-telemetry-data">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -147,15 +170,16 @@ export default function App() {
   if (error && mode === "replay") {
     return (
       <div className="h-screen bg-background text-error flex items-center justify-center flex-col gap-4 font-telemetry-data">
-        <span className="text-xl font-bold">ERROR LOADING TELEMETRY DATA</span>
+        <span className="text-xl font-bold">ERROR LOADING TELEMETRY MANIFEST</span>
         <span className="text-sm text-on-surface-variant">{error}</span>
       </div>
     );
   }
 
   // ── Derive current frame & mission from either mode ──
-  const missions = data?.missions || [];
-  const replayMission = missions.find(m => m.mission_id === selectedMissionId) || missions[0];
+  const manifestMissions = manifest?.missions || [];
+  const manifestMeta = manifestMissions.find(m => m.mission_id === selectedMissionId) || manifestMissions[0];
+  const activeLoadedMission = loadedMissions[selectedMissionId];
 
   let currentMission, currentFrame, telemetry, totalFrames;
 
@@ -165,17 +189,17 @@ export default function App() {
     totalFrames = live.streamMeta?.total_rows || live.history.length;
     currentMission = {
       mission_id: selectedMissionId,
-      callsign: live.streamMeta?.callsign || replayMission?.callsign || "",
-      fault_label: live.streamMeta?.fault_label || replayMission?.fault_label || "",
-      fault_type: replayMission?.fault_type || "",
-      fault_start_s: replayMission?.fault_start_s || 0,
+      callsign: live.streamMeta?.callsign || manifestMeta?.callsign || "",
+      fault_label: live.streamMeta?.fault_label || manifestMeta?.fault_label || "",
+      fault_type: manifestMeta?.fault_type || "",
+      fault_start_s: manifestMeta?.fault_start_s || 0,
       t_first_detected: currentFrame?.system_status?.anomaly_inception_s || 0,
       total_duration_s: totalFrames,
       telemetry: telemetry,
     };
   } else {
-    currentMission = replayMission;
-    telemetry = currentMission?.telemetry || [];
+    currentMission = activeLoadedMission || manifestMeta;
+    telemetry = activeLoadedMission?.telemetry || [];
     totalFrames = telemetry.length;
     const validIndex = Math.min(currentIndex, Math.max(0, totalFrames - 1));
     currentFrame = telemetry[validIndex] || telemetry[0] || {};
@@ -188,7 +212,7 @@ export default function App() {
       {/* Top Header Bar */}
       <Header 
         currentMission={currentMission}
-        missions={missions}
+        missions={manifestMissions}
         onSelectMission={handleSelectMission}
         metFormatted={currentFrame?.met_formatted}
         zuluClock={zuluClock}
@@ -206,7 +230,7 @@ export default function App() {
 
       {/* Main Workspace Canvas */}
       <div className="flex flex-1 overflow-hidden flex-col">
-        {/* Requirement #2 & #1: Clear inline error banner for Live Server unreachable / connection lost */}
+        {/* Error banner for Live Server unreachable / connection lost */}
         {mode === "live" && (live.serverUnreachable || live.connectionLost) && (
           <div className="bg-error/15 border-b border-error/40 px-4 py-2.5 flex items-center justify-between font-label-code text-xs text-error">
             <div className="flex items-center gap-2">
@@ -225,6 +249,14 @@ export default function App() {
               <span className="material-symbols-outlined text-[14px]">refresh</span>
               <span>RECONNECT</span>
             </button>
+          </div>
+        )}
+
+        {/* Loading spinner overlay when fetching per-mission JSON in replay mode */}
+        {mode === "replay" && loadingMission && !activeLoadedMission && (
+          <div className="bg-primary/10 border-b border-primary/30 px-4 py-2 flex items-center gap-2 font-label-code text-xs text-primary">
+            <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <span>LOADING MISSION DATA ({selectedMissionId.toUpperCase()})...</span>
           </div>
         )}
 

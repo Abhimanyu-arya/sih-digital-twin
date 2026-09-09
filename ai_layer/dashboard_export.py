@@ -2,7 +2,11 @@
 dashboard_export.py
 
 Pre-computes real telemetry, anomaly detection, gated 1D CNN RUL predictions,
-and SHAP top-3 contributing factors for demo missions into dashboard/public/demo_missions.json.
+and SHAP top-3 contributing factors for demo missions.
+
+Outputs:
+1. dashboard/public/demo_missions.json (Manifest listing metadata for all demo missions)
+2. dashboard/public/missions/mission_XXX.json (Per-mission telemetry JSON files, downsampled & compacted)
 """
 
 import os
@@ -21,13 +25,16 @@ from ai_layer.predict_pipeline import LivePredictor, DATASET_DIR, MODEL_PATH
 from ai_layer.rul_estimation.train_rul_model import RULConvNet, WINDOW_SIZE
 
 OUTPUT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../dashboard/public"))
-OUTPUT_JSON = os.path.join(OUTPUT_DIR, "demo_missions.json")
+MISSIONS_DIR = os.path.join(OUTPUT_DIR, "missions")
+MANIFEST_JSON = os.path.join(OUTPUT_DIR, "demo_missions.json")
+
+# Downsampling step (keep 1 out of every 2 rows = 2s telemetry step for replay performance)
+DOWNSAMPLE_STEP = 2
 
 # Sensor threshold calculation matching Rotax 912 official limits
 def get_sensor_status_and_pct(name, val):
     val = float(val)
     if name == "rpm":
-        # 0 to 6000 scale
         pct = min(100, max(0, int((val / 6000.0) * 100)))
         if val > 5800:
             status = "CRITICAL"
@@ -38,7 +45,6 @@ def get_sensor_status_and_pct(name, val):
         return status, pct, f"{val:.0f}", "RPM (CRANKSHAFT)"
 
     elif name == "cht_c":
-        # 0 to 160 C scale
         pct = min(100, max(0, int((val / 150.0) * 100)))
         if val >= 135.0:
             status = "CRITICAL"
@@ -49,7 +55,6 @@ def get_sensor_status_and_pct(name, val):
         return status, pct, f"{val:.1f}°C", "LIMIT: 135°C"
 
     elif name == "egt_c":
-        # 0 to 1000 C scale
         pct = min(100, max(0, int((val / 950.0) * 100)))
         if val >= 880.0:
             status = "CRITICAL"
@@ -60,7 +65,6 @@ def get_sensor_status_and_pct(name, val):
         return status, pct, f"{val:.0f}°C", "LIMIT: 880°C"
 
     elif name == "oil_pressure_bar":
-        # 0 to 7 bar scale. 2.0-5.0 normal. <0.8 critical.
         pct = min(100, max(0, int((val / 6.0) * 100)))
         if val < 0.8 or val > 7.0:
             status = "CRITICAL"
@@ -71,7 +75,6 @@ def get_sensor_status_and_pct(name, val):
         return status, pct, f"{val:.2f}", "BAR (2.0 - 5.0 BAR)"
 
     elif name == "oil_temp_c":
-        # 0 to 150 C scale. Normal 90-110 C, limit 130 C.
         pct = min(100, max(0, int((val / 140.0) * 100)))
         if val >= 130.0:
             status = "CRITICAL"
@@ -82,7 +85,6 @@ def get_sensor_status_and_pct(name, val):
         return status, pct, f"{val:.1f}°C", "LIMIT: 130°C"
 
     elif name == "vibration_g":
-        # 0 to 1.5 g scale. Limit 0.50 g.
         pct = min(100, max(0, int((val / 1.0) * 100)))
         if val > 0.80:
             status = "CRITICAL"
@@ -93,7 +95,6 @@ def get_sensor_status_and_pct(name, val):
         return status, pct, f"{val:.2f}", "g (LIMIT: 0.50 g)"
 
     elif name == "alternator_v":
-        # 0 to 18 V scale. Nom 13.8V.
         pct = min(100, max(0, int((val / 16.0) * 100)))
         if val < 12.0 or val > 15.0:
             status = "CRITICAL"
@@ -118,10 +119,6 @@ class ModelWrapper(nn.Module):
 
 
 def translate_feature_to_shap_factor(feat_name, mean_imp_score, weight_pct, rank, row_dict):
-    """
-    Translates raw/residual feature names into plain language diagnostic items for the UI.
-    Guarantees accurate data bindings and non-zero value strings.
-    """
     f_clean = feat_name.replace("_residual", "").replace("_z", "")
     val = float(row_dict.get(f_clean, 0.0))
 
@@ -231,10 +228,10 @@ def translate_feature_to_shap_factor(feat_name, mean_imp_score, weight_pct, rank
 
 def export_demo_missions():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(MISSIONS_DIR, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Exporting demo missions using device: {device}")
 
-    # Select representative demo missions (one per major fault type + healthy)
     summary_df = pd.read_csv(os.path.join(DATASET_DIR, "rul_summary.csv"))
     demo_specs = [
         {"mid": "mission_007", "label": "Oil Pressure System Degradation", "callsign": "FALCON-04 (MALE-UAV)"},
@@ -245,9 +242,9 @@ def export_demo_missions():
         {"mid": "mission_001", "label": "Nominal Baseline Flight", "callsign": "PATROL-05 (ROTAX-912)"},
     ]
 
-    exported_missions = []
+    manifest_missions = []
 
-    # Initialize SHAP explainer once using background data
+    # Initialize SHAP explainer once
     checkpoint = torch.load(MODEL_PATH, map_location=device, weights_only=False)
     features = checkpoint['features']
     raw_model = RULConvNet(in_channels=len(features)).to(device)
@@ -255,7 +252,6 @@ def export_demo_missions():
     raw_model.eval()
     model = ModelWrapper(raw_model).to(device)
 
-    # Build background tensor (100 synthetic nominal windows)
     bg_samples = np.zeros((20, WINDOW_SIZE, len(features)), dtype=np.float32)
     bg_tensor = torch.tensor(bg_samples, dtype=torch.float32).transpose(1, 2).to(device)
     explainer = shap.GradientExplainer(model, bg_tensor)
@@ -268,11 +264,12 @@ def export_demo_missions():
             continue
 
         df = pd.read_csv(csv_path)
+        total_rows = len(df)
         predictor = LivePredictor(model_path=MODEL_PATH)
         m_summary = summary_df[summary_df["mission_id"] == mid]
         fault_type = m_summary["fault_type"].values[0] if not m_summary.empty else "healthy"
 
-        print(f"Processing mission {mid} ({fault_type})...")
+        print(f"Processing mission {mid} ({fault_type}, {total_rows} rows)...")
 
         telemetry_frames = []
         fault_start_s = None
@@ -283,7 +280,7 @@ def export_demo_missions():
             row_dict = row.to_dict()
             ts = int(row_dict["timestamp"])
 
-            # Run predictor pipeline
+            # Run predictor pipeline for every row to maintain sliding window state
             res = predictor.process_telemetry(row_dict)
             status_str = res["status"]
             rul_sec = res["rul_seconds"]
@@ -292,13 +289,16 @@ def export_demo_missions():
                 t_first_detected = predictor.t_detected
                 fault_start_s = t_first_detected
 
-            # Format MET clock
+            # Downsample output frames: keep every DOWNSAMPLE_STEP th row + key moments
+            is_key_timestamp = (idx == 0 or idx == total_rows - 1 or ts == t_first_detected)
+            if not is_key_timestamp and (idx % DOWNSAMPLE_STEP != 0):
+                continue
+
             hrs = ts // 3600
             mins = (ts % 3600) // 60
             secs = ts % 60
             met_formatted = f"{hrs:02d}:{mins:02d}:{secs:02d}"
 
-            # Format 7 sensor readouts
             sensors_dict = {}
             for ch in ["rpm", "cht_c", "egt_c", "oil_pressure_bar", "oil_temp_c", "vibration_g", "alternator_v"]:
                 val = row_dict.get(ch, 0.0)
@@ -311,16 +311,12 @@ def export_demo_missions():
                     "pct": pct
                 }
 
-            # Format system health status
             persistence = (ts - t_first_detected) if t_first_detected is not None and ts >= t_first_detected else 0
-
             is_healthy_mission = (fault_type in ["none", "healthy"])
-            sens_statuses = [s["status"] for s in sensors_dict.values()]
             caution_sensors = [ch for ch, s in sensors_dict.items() if s["status"] == "CAUTION"]
             critical_sensors = [ch for ch, s in sensors_dict.items() if s["status"] == "CRITICAL"]
             clean_label = spec["label"]
 
-            # Top-level status driven strictly by residual anomaly detector & physical critical exceedances
             if len(critical_sensors) > 0 or (rul_sec is not None and rul_sec < 60):
                 sys_state = "CRITICAL"
                 sys_level = "LVL 3 EMERGENCY"
@@ -381,7 +377,6 @@ def export_demo_missions():
                     }
                 ]
             else:
-                # Faulted mission RUL payload
                 if rul_sec is not None:
                     r_hrs = int(rul_sec // 3600)
                     r_mins = int((rul_sec % 3600) // 60)
@@ -418,7 +413,6 @@ def export_demo_missions():
                         "advisory": "ALL SYSTEMS NOMINAL. CONTINUATION ON ASSIGNED FLIGHT PATH PERMITTED."
                     }
 
-                # Compute SHAP factors for faulted mission
                 if len(predictor.raw_window) == WINDOW_SIZE:
                     try:
                         if ts % 5 == 0 or not shap_factors:
@@ -475,7 +469,8 @@ def export_demo_missions():
 
             telemetry_frames.append(frame_data)
 
-        mission_entry = {
+        # Full per-mission JSON payload
+        mission_payload = {
             "mission_id": mid,
             "callsign": spec["callsign"],
             "fault_type": fault_type,
@@ -484,21 +479,44 @@ def export_demo_missions():
             "serial_no": "SN-8841-A2",
             "fault_start_s": fault_start_s if fault_start_s is not None else 0,
             "t_first_detected": t_first_detected if t_first_detected is not None else 0,
-            "total_duration_s": len(df),
+            "total_duration_s": total_rows,
+            "frame_step_s": DOWNSAMPLE_STEP,
             "telemetry": telemetry_frames
         }
 
-        exported_missions.append(mission_entry)
+        # Save per-mission JSON file (compacted, no indent)
+        mission_json_path = os.path.join(MISSIONS_DIR, f"{mid}.json")
+        with open(mission_json_path, "w") as f:
+            json.dump(mission_payload, f, separators=(',', ':'))
 
-    export_obj = {
-        "export_timestamp": "2026-09-06T22:50:00Z",
-        "missions": exported_missions
+        size_kb = os.path.getsize(mission_json_path) / 1024.0
+        print(f"  -> Saved {mission_json_path} ({len(telemetry_frames)} frames, {size_kb:.1f} KB)")
+
+        # Manifest entry (without heavy telemetry array)
+        manifest_missions.append({
+            "mission_id": mid,
+            "callsign": spec["callsign"],
+            "fault_type": fault_type,
+            "fault_label": spec["label"],
+            "engine_id": "ROTAX-912-ULS",
+            "serial_no": "SN-8841-A2",
+            "fault_start_s": fault_start_s if fault_start_s is not None else 0,
+            "t_first_detected": t_first_detected if t_first_detected is not None else 0,
+            "total_duration_s": total_rows,
+            "file_path": f"/missions/{mid}.json",
+            "total_frames": len(telemetry_frames),
+        })
+
+    # Save manifest JSON file (compacted)
+    manifest_obj = {
+        "export_timestamp": "2026-09-09T13:55:00Z",
+        "missions": manifest_missions
     }
+    with open(MANIFEST_JSON, "w") as f:
+        json.dump(manifest_obj, f, separators=(',', ':'))
 
-    with open(OUTPUT_JSON, "w") as f:
-        json.dump(export_obj, f, indent=2)
-
-    print(f"\nSuccessfully exported {len(exported_missions)} demo missions to {OUTPUT_JSON}!")
+    manifest_kb = os.path.getsize(MANIFEST_JSON) / 1024.0
+    print(f"\nSuccessfully exported manifest to {MANIFEST_JSON} ({manifest_kb:.1f} KB) and per-mission files to {MISSIONS_DIR}!")
 
 
 if __name__ == "__main__":
