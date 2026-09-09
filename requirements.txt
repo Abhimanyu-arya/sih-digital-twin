@@ -7,5 +7,10 @@ scikit-learn
 torch
 shap
 
+# Live streaming server
+fastapi
+uvicorn[standard]
+websockets
+
 # Utilities
 matplotlib

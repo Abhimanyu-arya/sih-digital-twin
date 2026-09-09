@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import LiveIndicator from './LiveIndicator';
 
 export default function Header({ 
   currentMission, 
@@ -8,7 +9,14 @@ export default function Header({
   zuluClock,
   systemState,
   isDebugOpen,
-  onToggleDebug
+  onToggleDebug,
+  mode,
+  onSetMode,
+  isLiveConnected,
+  isLiveStreaming,
+  liveSpeed = 10,
+  onLiveSpeedChange,
+  onLiveReset,
 }) {
   const [audioMuted, setAudioMuted] = useState(false);
   const [isOverflowOpen, setIsOverflowOpen] = useState(false);
@@ -74,6 +82,69 @@ export default function Header({
           <span className={`w-1.5 h-1.5 rounded-full ${isCritical ? 'bg-error' : isDegraded ? 'bg-tertiary' : 'bg-secondary'}`}></span>
           <span>{systemState || 'NOMINAL'}</span>
         </span>
+      </div>
+
+      {/* Middle Mode Selector & Live Controls */}
+      <div className="flex items-center gap-2">
+        {/* Mode Switcher: REPLAY vs LIVE */}
+        <div className="flex items-center bg-surface-container-low p-0.5 border border-outline-variant/40 rounded font-label-code text-xs">
+          <button
+            type="button"
+            onClick={() => onSetMode("replay")}
+            className={`px-2.5 py-1 rounded transition-colors ${
+              mode === "replay" 
+                ? "bg-surface-container-high text-primary font-bold shadow-sm" 
+                : "text-outline hover:text-on-surface"
+            }`}
+          >
+            REPLAY
+          </button>
+          <button
+            type="button"
+            onClick={() => onSetMode("live")}
+            className={`px-2.5 py-1 rounded transition-colors flex items-center gap-1.5 ${
+              mode === "live" 
+                ? "bg-primary/20 text-primary font-bold border border-primary/40 shadow-sm" 
+                : "text-outline hover:text-on-surface"
+            }`}
+          >
+            <span>LIVE</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          </button>
+        </div>
+
+        {/* Live Controls (when mode === "live") */}
+        {mode === "live" && (
+          <div className="flex items-center gap-2">
+            <LiveIndicator isStreaming={isLiveStreaming} isConnected={isLiveConnected} />
+            
+            {/* Speed selector (defaulting to 10x) */}
+            <div className="flex items-center gap-1 bg-surface-container-low px-2 py-1 border border-outline-variant/40 rounded text-xs font-label-code">
+              <span className="text-outline text-[10px]">SPEED:</span>
+              <select
+                value={liveSpeed}
+                onChange={(e) => onLiveSpeedChange && onLiveSpeedChange(Number(e.target.value))}
+                className="bg-transparent text-primary font-bold focus:outline-none cursor-pointer"
+              >
+                <option value={1} className="bg-surface-container text-on-surface">1x (Real-time)</option>
+                <option value={5} className="bg-surface-container text-on-surface">5x</option>
+                <option value={10} className="bg-surface-container text-on-surface">10x (Demo Default)</option>
+                <option value={50} className="bg-surface-container text-on-surface">50x (Fast)</option>
+              </select>
+            </div>
+
+            {/* Reset Live Session Button */}
+            <button
+              type="button"
+              onClick={onLiveReset}
+              className="px-2 py-1 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/40 text-outline hover:text-on-surface rounded font-label-code text-xs flex items-center gap-1"
+              title="Reset Live Stream to T=0"
+            >
+              <span className="material-symbols-outlined text-[14px]">restart_alt</span>
+              <span className="hidden md:inline">RESET</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Right Controls: Single Compact Readout + Overflow Menu */}
@@ -160,4 +231,3 @@ export default function Header({
     </header>
   );
 }
-
